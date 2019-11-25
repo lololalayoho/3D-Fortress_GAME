@@ -2,8 +2,12 @@
 #include <iostream>
 #include <GL/freeglut.h>
 #include "ObjParser.h"
-#define M_PI       3.14159265358979323846
+#define M_PI 3.14159265358979323846
 using namespace std;
+
+//------------Multi viewport--------//
+int current_width;
+int current_height;
 
 //--------------회전 위치-----------//
 int xup = 0;
@@ -137,7 +141,6 @@ void draw(void) {
 	draw_obj(&object); //object 그리기
 	glPopMatrix();
 	draw_axies();
-	glFlush();
 	glutSwapBuffers();
 }
 
@@ -181,7 +184,7 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 	else if (key == 'c') {
 		color_index = color_index + 1;
-		if (color_index == 8) color_index = 0;
+		if (color_index == 9) color_index = 0;
 	}
 	else if (key == 'l')
 		location_z = location_z - 1;
@@ -251,7 +254,14 @@ void keyboard(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
+void main_menu_function(int option) {
+	printf("Main menu %d \n", option);
+}
+
+
 int main(int argc, char **argv) {
+
+	int submenual;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -266,6 +276,14 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(keyboard);
 	glutPostRedisplay();
 	glutReshapeFunc(resize);
+
+	glutCreateMenu(main_menu_function);
+	glutAddMenuEntry("Save Tank", 1);
+	glutAddMenuEntry("Load Tank", 2);
+	glutAddMenuEntry("Go to Game Mode", 3);
+	glutAddMenuEntry("Quit",4);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+
 	glutMainLoop();
 	return 0;
 }
