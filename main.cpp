@@ -5,9 +5,6 @@
 #define M_PI 3.14159265358979323846
 using namespace std;
 
-//------------Multi viewport--------//
-int current_width;
-int current_height;
 
 //--------------회전 위치-----------//
 int xup = 0;
@@ -29,17 +26,21 @@ double camera_angle_h = 0;
 double camera_angle_v = 0;
 
 //--------------location 위치-----------//
+int changeflag = 0;
 float location_x, location_y, location_z;
 //--------------color 위치-----------//
-int picture_index,color_index;
+int picture_index,color_index,merge_index;
 
 ObjParser object;
+
+
 struct color {
 	float R;
 	float G;
 	float B;
 };
 
+vector<ObjParser> object1;
 char picture[][50] = { "body2-1.obj","body2-2.obj","body2-3.obj","Leg1.obj","Leg2.obj","Leg3.obj","body1-1.obj","body1-2.obj","body1-3.obj","head1-1.obj","head1-2.obj","head1-3.obj" };
 color paint[50] = { {1.0f,0.0f,0.0f},{0.0f,1.0f,0.0f},{ 0.0f,0.0f,1.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,1.0f},{0.5f,0.5f,0.5f},{0.5f,0.0f,0.5f},{1.0f,0.0f,1.0f},{0.0f,0.5f,0.5f} };//red, green, blue, yellow, aqua, gray, purple ,fuchsia, teal;
 
@@ -85,6 +86,7 @@ void resize(int width, int height) {
 }
 
 void draw_axies() {
+	glLoadIdentity();
 	glLineWidth(3);
 	glBegin(GL_LINES);
 	glColor3f(1, 0, 0);
@@ -127,27 +129,53 @@ void draw_obj(ObjParser *object) {
 	glutPostRedisplay();
 }
 
-void draw(void) {
+void draw_preview() {
 	object = (picture[picture_index]);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
+	glViewport(500,400,450,300);
+	glLoadIdentity();
+	glColor3f(0.5f, 0.5f, 0.5f);
+	gluLookAt(5, 5, 5, 0, 0, 0, 0, 1, 0);
+	draw_obj(&object);
+	glFlush();
+	glutPostRedisplay();
+}
+void draw_merge_block() {
+	ObjParser obj;
+	obj = (picture[merge_index]);
+	glViewport(-50, -200,900, 900);
 	glLoadIdentity();
 	gluLookAt(eyex, eyez, eyey, 0, 0, 0, xup, yup, zup); //회전하기
 	glColor4f(paint[color_index].R, paint[color_index].G, paint[color_index].B, 1.0f); //색깔바꾸기
+	object1.push_back(obj);
 	glPushMatrix();
-	glTranslatef(location_x, location_y, location_z); //위치 바꾸기
+	
 	glRotated(camera_angle_v, 1.0, 0.0, 0.0);
 	glRotated(camera_angle_h, 0.0, 1.0, 0.0);
-	draw_obj(&object); //object 그리기
+	for (int i = 0; i < object1.size(); i++) {
+		if (changeflag == 1) {
+			glTranslatef(location_x, location_y, location_z);
+		}
+		draw_obj(&object1[i]);
+	} //object 그리기
 	glPopMatrix();
+	glFlush();
+	glutPostRedisplay();
+}
+
+void draw(void) {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	draw_preview();
+	draw_merge_block();
 	draw_axies();
 	glutSwapBuffers();
 }
 
 void mouse_move(int x, int y) {
 	if (dragging) {
-		camera_angle_v += (y - drag_y)*0.3;
-		camera_angle_h += (x - drag_x)*0.3;
+		camera_angle_v = camera_angle_v + (y - drag_y)*0.4;
+		camera_angle_h = camera_angle_h + (x - drag_x)*0.4;
 		drag_x = x;
 		drag_y = y;
 	}
@@ -176,7 +204,6 @@ void mouse(int button, int state, int x, int y) {
 		dragging = 0;
 }
 
-
 void keyboard(unsigned char key, int x, int y) {
 	if (key == 'f') {
 		picture_index = picture_index + 1;
@@ -186,18 +213,34 @@ void keyboard(unsigned char key, int x, int y) {
 		color_index = color_index + 1;
 		if (color_index == 9) color_index = 0;
 	}
-	else if (key == 'l')
+	else if (key == VK_SPACE) {
+		merge_index = picture_index;
+		draw_merge_block();
+	}
+	else if (key == 'l') {
+		changeflag = 1;
 		location_z = location_z - 1;
-	else if (key == 'j')
+	}
+	else if (key == 'j') {
+		changeflag = 1;
 		location_z = location_z + 1;
-	else if (key == 'k')
+	}
+	else if (key == 'k') {
+		changeflag = 1;
 		location_x = location_x + 1;
-	else if (key == 'i')
+	}
+	else if (key == 'i') {
+		changeflag = 1;
 		location_x = location_x - 1;
-	else if (key == ',')
+	}
+	else if (key == ',') {
+		changeflag = 1;
 		location_y = location_y + 1;
-	else if (key == '.')
+	}
+	else if (key == '.') {
+		changeflag = 1;
 		location_y = location_y - 1;
+	}
 	else if (key == '9') {
 		pian = pian - change;
 		eyex = r * sin(thean)*cos(pian);
@@ -265,8 +308,8 @@ int main(int argc, char **argv) {
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(800, 600);
-	glutInitWindowPosition(300, 100);
+	glutInitWindowSize(900, 700);
+	glutInitWindowPosition(100, 50);
 	glutCreateWindow("Mini_project");
 
 	init();
