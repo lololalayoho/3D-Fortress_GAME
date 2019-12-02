@@ -18,6 +18,7 @@ double eyex = r * sin(thean)*cos(pian);
 double eyey = r * sin(thean)*sin(pian);
 double eyez = r * cos(thean);
 
+
 //-------------drag변수-------------------//
 int drag_x;
 int drag_y;
@@ -28,19 +29,28 @@ double camera_angle_v = 0;
 //--------------location 위치-----------//
 int changeflag = 0;
 float location_x, location_y, location_z;
+double changeangle;
 //--------------color 위치-----------//
 int picture_index,color_index,merge_index;
 
 ObjParser object;
+ObjParser obj;
+vector<ObjParser> object1;
 
-
+struct condition {
+	ObjParser lego;
+	float change_x;
+	float change_y;
+	float change_z;
+	double changeangle;
+};
 struct color {
 	float R;
 	float G;
 	float B;
 };
+vector<condition> Lego; condition cond;
 
-vector<ObjParser> object1;
 char picture[][50] = { "body2-1.obj","body2-2.obj","body2-3.obj","Leg1.obj","Leg2.obj","Leg3.obj","body1-1.obj","body1-2.obj","body1-3.obj","head1-1.obj","head1-2.obj","head1-3.obj" };
 color paint[50] = { {1.0f,0.0f,0.0f},{0.0f,1.0f,0.0f},{ 0.0f,0.0f,1.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,1.0f},{0.5f,0.5f,0.5f},{0.5f,0.0f,0.5f},{1.0f,0.0f,1.0f},{0.0f,0.5f,0.5f} };//red, green, blue, yellow, aqua, gray, purple ,fuchsia, teal;
 
@@ -140,23 +150,19 @@ void draw_preview() {
 	glutPostRedisplay();
 }
 void draw_merge_block() {
-	ObjParser obj;
-	obj = (picture[merge_index]);
+	glMatrixMode(GL_MODELVIEW);
 	glViewport(-50, -200,900, 900);
 	glLoadIdentity();
 	gluLookAt(eyex, eyez, eyey, 0, 0, 0, xup, yup, zup); //회전하기
-	glColor4f(paint[color_index].R, paint[color_index].G, paint[color_index].B, 1.0f); //색깔바꾸기
-	object1.push_back(obj);
 	glPushMatrix();
-	
 	glRotated(camera_angle_v, 1.0, 0.0, 0.0);
 	glRotated(camera_angle_h, 0.0, 1.0, 0.0);
-	for (int i = 0; i < object1.size(); i++) {
-		if (changeflag == 1) {
-			glTranslatef(location_x, location_y, location_z);
-		}
-		draw_obj(&object1[i]);
-	} //object 그리기
+	for (int i = 0; i < Lego.size(); i++) {
+		glColor4f(paint[color_index].R, paint[color_index].G, paint[color_index].B, 1.0f); //색깔바꾸기
+		glTranslatef(Lego[i].change_x, Lego[i].change_y, Lego[i].change_z);
+		glRotated(Lego[i].changeangle,0.0, 1.0, 0.0);
+		draw_obj(&Lego[i].lego); //object 그리기
+	}
 	glPopMatrix();
 	glFlush();
 	glutPostRedisplay();
@@ -168,7 +174,6 @@ void draw(void) {
 	glLoadIdentity();
 	draw_preview();
 	draw_merge_block();
-	draw_axies();
 	glutSwapBuffers();
 }
 
@@ -215,43 +220,41 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 	else if (key == VK_SPACE) {
 		merge_index = picture_index;
-		draw_merge_block();
+		obj = (picture[merge_index]);
+		cond.lego = obj;
+		Lego.push_back(cond);
 	}
 	else if (key == 'l') {
 		changeflag = 1;
-		location_z = location_z - 1;
+		Lego[Lego.size() - 1].change_z = Lego[Lego.size() - 1].change_z - 0.1;
 	}
 	else if (key == 'j') {
 		changeflag = 1;
-		location_z = location_z + 1;
+		Lego[Lego.size() - 1].change_z = Lego[Lego.size() - 1].change_z + 0.1;
 	}
 	else if (key == 'k') {
 		changeflag = 1;
-		location_x = location_x + 1;
+		Lego[Lego.size() - 1].change_x = Lego[Lego.size() - 1].change_x + 0.1;
 	}
 	else if (key == 'i') {
 		changeflag = 1;
-		location_x = location_x - 1;
+		Lego[Lego.size() - 1].change_x = Lego[Lego.size() - 1].change_x - 0.1;
 	}
 	else if (key == ',') {
 		changeflag = 1;
-		location_y = location_y + 1;
+		Lego[Lego.size() - 1].change_y = Lego[Lego.size() - 1].change_y + 0.1;
 	}
 	else if (key == '.') {
 		changeflag = 1;
-		location_y = location_y - 1;
+		Lego[Lego.size() - 1].change_y = Lego[Lego.size() - 1].change_y - 0.1;
 	}
 	else if (key == '9') {
-		pian = pian - change;
-		eyex = r * sin(thean)*cos(pian);
-		eyey = r * sin(thean)*sin(pian);
-		eyez = r * cos(thean);
+		changeflag = 1;
+		Lego[Lego.size() - 1].changeangle = Lego[Lego.size() - 1].changeangle + 90;
 	}
 	else if (key == '0') {
-		pian = pian + change;
-		eyex = r * sin(thean)*cos(pian);
-		eyey = r * sin(thean)*sin(pian);
-		eyez = r * cos(thean);
+		changeflag = 1;
+		Lego[Lego.size() - 1].changeangle = Lego[Lego.size() - 1].changeangle - 90;
 	}
 	else if (key == '-') {
 		thean = thean + change;
@@ -293,6 +296,9 @@ void keyboard(unsigned char key, int x, int y) {
 		eyey = r * sin(thean)*sin(pian);
 		eyez = r * cos(thean);
 
+	}
+	else if (key == 'u') {
+		Lego.pop_back();
 	}
 	glutPostRedisplay();
 }
