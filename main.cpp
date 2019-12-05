@@ -1,6 +1,7 @@
 #include "bmpfuncs.h"
 #include <iostream>
 #include <GL/freeglut.h>
+#
 #include "ObjParser.h"
 #define M_PI 3.14159265358979323846
 using namespace std;
@@ -12,8 +13,8 @@ int yup = 1;
 int zup = 0;
 double change = 5 * (M_PI / 180);
 double r = 10;
-double pian = 50 * (M_PI / 180) ;
-double thean =50 * (M_PI / 180);
+double pian =  50 *(M_PI / 180) ;
+double thean = 50 *(M_PI / 180);
 double eyex = r * sin(thean)*cos(pian);
 double eyey = r * sin(thean)*sin(pian);
 double eyez = r * cos(thean);
@@ -43,6 +44,7 @@ struct condition {
 	float change_y;
 	float change_z;
 	double changeangle;
+	int lego_color_index;
 };
 struct color {
 	float R;
@@ -96,7 +98,6 @@ void resize(int width, int height) {
 }
 
 void draw_axies() {
-	glLoadIdentity();
 	glLineWidth(3);
 	glBegin(GL_LINES);
 	glColor3f(1, 0, 0);
@@ -105,14 +106,13 @@ void draw_axies() {
 
 	glColor3f(0, 1, 0);
 	glVertex3f(0, 0, 0);
-	glVertex3f(0, 3, 0);
+	glVertex3f(0, 4, 0);
 
 	glColor3f(0, 0, 1);
 	glVertex3f(0, 0, 0);
 	glVertex3f(0, 0, 4);
 
 	glEnd();
-	glLineWidth(1);
 }
 
 void draw_obj(ObjParser *object) {
@@ -141,28 +141,31 @@ void draw_obj(ObjParser *object) {
 
 void draw_preview() {
 	object = (picture[picture_index]);
-	glViewport(500,400,450,300);
+	glViewport(600,450,300,250);
 	glLoadIdentity();
+	draw_axies();
 	glColor3f(0.5f, 0.5f, 0.5f);
 	gluLookAt(5, 5, 5, 0, 0, 0, 0, 1, 0);
 	draw_obj(&object);
+
 	glFlush();
 	glutPostRedisplay();
 }
 void draw_merge_block() {
 	glMatrixMode(GL_MODELVIEW);
-	glViewport(-50, -200,900, 900);
+	glViewport(100, 50,600, 400);
 	glLoadIdentity();
 	gluLookAt(eyex, eyez, eyey, 0, 0, 0, xup, yup, zup); //회전하기
 	glPushMatrix();
 	glRotated(camera_angle_v, 1.0, 0.0, 0.0);
 	glRotated(camera_angle_h, 0.0, 1.0, 0.0);
 	for (int i = 0; i < Lego.size(); i++) {
-		glColor4f(paint[color_index].R, paint[color_index].G, paint[color_index].B, 1.0f); //색깔바꾸기
+		glColor4f(paint[Lego[i].lego_color_index].R, paint[Lego[i].lego_color_index].G, paint[Lego[i].lego_color_index].B, 1.0f); //색깔바꾸기
 		glTranslatef(Lego[i].change_x, Lego[i].change_y, Lego[i].change_z);
 		glRotated(Lego[i].changeangle,0.0, 1.0, 0.0);
 		draw_obj(&Lego[i].lego); //object 그리기
 	}
+
 	glPopMatrix();
 	glFlush();
 	glutPostRedisplay();
@@ -174,6 +177,7 @@ void draw(void) {
 	glLoadIdentity();
 	draw_preview();
 	draw_merge_block();
+	draw_axies();
 	glutSwapBuffers();
 }
 
@@ -217,6 +221,7 @@ void keyboard(unsigned char key, int x, int y) {
 	else if (key == 'c') {
 		color_index = color_index + 1;
 		if (color_index == 9) color_index = 0;
+		Lego[Lego.size() - 1].lego_color_index = color_index;
 	}
 	else if (key == VK_SPACE) {
 		merge_index = picture_index;
