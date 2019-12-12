@@ -34,10 +34,6 @@ double changeangle;
 //--------------color 위치-----------//
 int picture_index,color_index,merge_index;
 
-ObjParser object;
-ObjParser obj;
-vector<ObjParser> object1;
-
 struct condition {
 	ObjParser lego;
 	float change_x;
@@ -51,9 +47,9 @@ struct color {
 	float G;
 	float B;
 };
-vector<condition> Lego; condition cond;
+vector<condition> Lego; condition cond; float angel1 = 0;ObjParser object;ObjParser obj;
 
-char picture[][50] = { "body2-1.obj","body2-2.obj","body2-3.obj","Leg1.obj","Leg2.obj","Leg3.obj","body1-1.obj","body1-2.obj","body1-3.obj","head1-1.obj","head1-2.obj","head1-3.obj" };
+char picture[][50] = { "body2-1.obj","body2-2.obj","body2-3.obj","Leg1.obj","Leg2.obj","Leg3.obj","body1-1.obj","body1-2.obj","body1-3.obj","head1-1.obj","head1-3.obj" };
 color paint[50] = { {1.0f,0.0f,0.0f},{0.0f,1.0f,0.0f},{ 0.0f,0.0f,1.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,1.0f},{0.5f,0.5f,0.5f},{0.5f,0.0f,0.5f},{1.0f,0.0f,1.0f},{0.0f,0.5f,0.5f} };//red, green, blue, yellow, aqua, gray, purple ,fuchsia, teal;
 
 void init(void) {
@@ -89,6 +85,11 @@ void init(void) {
 	glEnable(GL_DEPTH_TEST);
 }
 
+void idle(void) {
+	angel1 = angel1 + 0.05;
+	if (angel1 > 360) { angel1 -= 360; }
+}
+
 void resize(int width, int height) {
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
@@ -97,7 +98,31 @@ void resize(int width, int height) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void draw_string(void * font, const char *str, int x, int y) {
+	glPushAttrib(GL_LIGHTING_BIT);
+	glDisable(GL_LIGHTING);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(-5, 15, -5, 15);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glRasterPos3f(x, y, 0);
+	for (unsigned int i = 0; i < strlen(str); i++) {
+		glutBitmapCharacter(font, str[i]);
+	}
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopAttrib();
+}
+
 void draw_axies() {
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
 	glLineWidth(3);
 	glBegin(GL_LINES);
 	glColor3f(1, 0, 0);
@@ -113,6 +138,8 @@ void draw_axies() {
 	glVertex3f(0, 0, 4);
 
 	glEnd();
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
 }
 
 void draw_obj(ObjParser *object) {
@@ -139,21 +166,60 @@ void draw_obj(ObjParser *object) {
 	glutPostRedisplay();
 }
 
+void draw_text() {
+	glViewport(0,50,200,700);
+	glLoadIdentity();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "l : GO Forward", 0, 0);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "j : GO backward", 0, 1);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "k : GO to Left", 0, 2);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "L : Go to Right", 0, 3);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, ", : Go to Top", 0, 4);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, ". : Go to Down", 0, 5);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "u : Remove Lego", 0, 6);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "c : Change color", 0, 7);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "space bar : Choose Lego ", 0, 8);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "- : Spin to Top", 0, 9);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "= : Spin to Down", 0, 10);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "9 : Spin 90 angle for Left ", 0,11);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "0 : Spin 90 angle for Right ", 0, 12);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glFlush();
+}
+
 void draw_preview() {
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
 	object = (picture[picture_index]);
-	glViewport(600,450,300,250);
+	glViewport(900,400,300,300);
 	glLoadIdentity();
 	draw_axies();
 	glColor3f(0.5f, 0.5f, 0.5f);
 	gluLookAt(5, 5, 5, 0, 0, 0, 0, 1, 0);
+	glRotatef(angel1, 0, 1, 0);
 	draw_obj(&object);
-
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
 	glFlush();
 	glutPostRedisplay();
 }
+
 void draw_merge_block() {
 	glMatrixMode(GL_MODELVIEW);
-	glViewport(100, 50,600, 400);
+	glViewport(300, 0,800, 500);
 	glLoadIdentity();
 	gluLookAt(eyex, eyez, eyey, 0, 0, 0, xup, yup, zup); //회전하기
 	glPushMatrix();
@@ -165,7 +231,6 @@ void draw_merge_block() {
 		glRotated(Lego[i].changeangle,0.0, 1.0, 0.0);
 		draw_obj(&Lego[i].lego); //object 그리기
 	}
-
 	glPopMatrix();
 	glFlush();
 	glutPostRedisplay();
@@ -175,9 +240,16 @@ void draw(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	glPushMatrix();
 	draw_preview();
+	glPopMatrix();
+	glPushMatrix();
+	draw_text();
+	glPopMatrix();
+	glPushMatrix();
 	draw_merge_block();
 	draw_axies();
+	glPopMatrix();
 	glutSwapBuffers();
 }
 
@@ -319,7 +391,7 @@ int main(int argc, char **argv) {
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(900, 700);
+	glutInitWindowSize(1200, 700);
 	glutInitWindowPosition(100, 50);
 	glutCreateWindow("Mini_project");
 
@@ -327,6 +399,7 @@ int main(int argc, char **argv) {
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouse_move);
 	glutDisplayFunc(draw);
+	glutIdleFunc(idle);
 	glutKeyboardFunc(keyboard);
 	glutPostRedisplay();
 	glutReshapeFunc(resize);

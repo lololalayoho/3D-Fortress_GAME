@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "GL/freeglut.h"
+#include <GL/glext.h>
 #include "bmpfuncs.h"
 
 void storeImage(float *imageOut, const char *filename, int rows, int cols, 
