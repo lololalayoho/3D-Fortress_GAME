@@ -1,7 +1,9 @@
 #include "bmpfuncs.h"
 #include <iostream>
+#include <vector>
 #include <GL/freeglut.h>
-#
+#include <stdlib.h>
+#include <fstream>
 #include "ObjParser.h"
 #define M_PI 3.14159265358979323846
 using namespace std;
@@ -35,7 +37,7 @@ double changeangle;
 int picture_index,color_index,merge_index;
 
 struct condition {
-	ObjParser lego;
+	int lego;
 	float change_x;
 	float change_y;
 	float change_z;
@@ -47,9 +49,9 @@ struct color {
 	float G;
 	float B;
 };
-vector<condition> Lego; condition cond; float angel1 = 0;ObjParser object;ObjParser obj;
+vector<condition> Lego; condition cond; float angel1 = 0; ObjParser object; ObjParser obj;
 
-char picture[][50] = { "body2-1.obj","body2-2.obj","body2-3.obj","Leg1.obj","Leg2.obj","Leg3.obj","body1-1.obj","body1-2.obj","body1-3.obj","head1-1.obj","head1-3.obj" };
+char picture[][50] = { "image/body2-1.obj","image/body2-2.obj","image/body2-3.obj","image/Leg1.obj","image/Leg2.obj","image/Leg3.obj","image/body1-1.obj","image/body1-2.obj","image/body1-3.obj","image/head1-1.obj","image/head1-2.obj","image/head1-3.obj" };
 color paint[50] = { {1.0f,0.0f,0.0f},{0.0f,1.0f,0.0f},{ 0.0f,0.0f,1.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,1.0f},{0.5f,0.5f,0.5f},{0.5f,0.0f,0.5f},{1.0f,0.0f,1.0f},{0.0f,0.5f,0.5f} };//red, green, blue, yellow, aqua, gray, purple ,fuchsia, teal;
 
 void init(void) {
@@ -169,31 +171,18 @@ void draw_obj(ObjParser *object) {
 void draw_text() {
 	glViewport(0,50,200,700);
 	glLoadIdentity();
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "l : GO Forward", 0, 0);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "j : GO backward", 0, 1);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "k : GO to Left", 0, 2);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "L : Go to Right", 0, 3);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, ", : Go to Top", 0, 4);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, ". : Go to Down", 0, 5);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "u : Remove Lego", 0, 6);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "c : Change color", 0, 7);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "space bar : Choose Lego ", 0, 8);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "- : Spin to Top", 0, 9);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "= : Spin to Down", 0, 10);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "9 : Spin 90 angle for Left ", 0,11);
-	glColor3f(1.0f, 1.0f, 1.0f);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "0 : Spin 90 angle for Right ", 0, 12);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
@@ -211,6 +200,7 @@ void draw_preview() {
 	gluLookAt(5, 5, 5, 0, 0, 0, 0, 1, 0);
 	glRotatef(angel1, 0, 1, 0);
 	draw_obj(&object);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "Preview", 0, 10);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
 	glFlush();
@@ -226,10 +216,13 @@ void draw_merge_block() {
 	glRotated(camera_angle_v, 1.0, 0.0, 0.0);
 	glRotated(camera_angle_h, 0.0, 1.0, 0.0);
 	for (int i = 0; i < Lego.size(); i++) {
+		glPushMatrix();
 		glColor4f(paint[Lego[i].lego_color_index].R, paint[Lego[i].lego_color_index].G, paint[Lego[i].lego_color_index].B, 1.0f); //색깔바꾸기
 		glTranslatef(Lego[i].change_x, Lego[i].change_y, Lego[i].change_z);
 		glRotated(Lego[i].changeangle,0.0, 1.0, 0.0);
-		draw_obj(&Lego[i].lego); //object 그리기
+		object = picture[Lego[i].lego];
+		draw_obj(&object); //object 그리기
+		glPopMatrix();
 	}
 	glPopMatrix();
 	glFlush();
@@ -240,16 +233,10 @@ void draw(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glPushMatrix();
 	draw_preview();
-	glPopMatrix();
-	glPushMatrix();
 	draw_text();
-	glPopMatrix();
-	glPushMatrix();
 	draw_merge_block();
 	draw_axies();
-	glPopMatrix();
 	glutSwapBuffers();
 }
 
@@ -296,41 +283,33 @@ void keyboard(unsigned char key, int x, int y) {
 		Lego[Lego.size() - 1].lego_color_index = color_index;
 	}
 	else if (key == VK_SPACE) {
+		int c_x=0,c_y=0,c_z=0,c_an=0;
 		merge_index = picture_index;
-		obj = (picture[merge_index]);
-		cond.lego = obj;
+		cond.lego = merge_index;
 		Lego.push_back(cond);
 	}
 	else if (key == 'l') {
-		changeflag = 1;
 		Lego[Lego.size() - 1].change_z = Lego[Lego.size() - 1].change_z - 0.1;
 	}
 	else if (key == 'j') {
-		changeflag = 1;
 		Lego[Lego.size() - 1].change_z = Lego[Lego.size() - 1].change_z + 0.1;
 	}
 	else if (key == 'k') {
-		changeflag = 1;
 		Lego[Lego.size() - 1].change_x = Lego[Lego.size() - 1].change_x + 0.1;
 	}
 	else if (key == 'i') {
-		changeflag = 1;
 		Lego[Lego.size() - 1].change_x = Lego[Lego.size() - 1].change_x - 0.1;
 	}
 	else if (key == ',') {
-		changeflag = 1;
 		Lego[Lego.size() - 1].change_y = Lego[Lego.size() - 1].change_y + 0.1;
 	}
 	else if (key == '.') {
-		changeflag = 1;
 		Lego[Lego.size() - 1].change_y = Lego[Lego.size() - 1].change_y - 0.1;
 	}
 	else if (key == '9') {
-		changeflag = 1;
 		Lego[Lego.size() - 1].changeangle = Lego[Lego.size() - 1].changeangle + 90;
 	}
 	else if (key == '0') {
-		changeflag = 1;
 		Lego[Lego.size() - 1].changeangle = Lego[Lego.size() - 1].changeangle - 90;
 	}
 	else if (key == '-') {
@@ -379,15 +358,110 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 	glutPostRedisplay();
 }
+void sub_menu_savetank(int option) {
+	if (option == 1) {
+		ofstream out("data1.txt", ios::trunc);
+		if (out.is_open()) {
+			for (int i = 0; i < Lego.size(); i++) {
+				out << Lego[i].lego << endl;
+				out << Lego[i].change_x << endl;
+				out << Lego[i].change_y << endl;
+				out << Lego[i].change_z << endl;
+				out << Lego[i].changeangle << endl;
+				out << Lego[i].lego_color_index << endl;
+			}
+			printf("data1 save\n");
+		}
+		else printf("파일이 없습니다.\n");
+		out.close();
+	}
+	else if (option == 2) {
+		ofstream out("data2.txt", ios::trunc);
+		if (out.is_open()) {
+			for (int i = 0; i < Lego.size(); i++) {
+				out << Lego[i].lego << endl;
+				out << Lego[i].change_x << endl;
+				out << Lego[i].change_y << endl;
+				out << Lego[i].change_z << endl;
+				out << Lego[i].changeangle << endl;
+				out << Lego[i].lego_color_index << endl;
+			}
+			printf("data2 save\n");
+		}
+		else printf("파일이 없습니다.\n");
+		out.close();
+	}
+	glutPostRedisplay();
+}
+
+void sub_menu_Loadtank(int option) {
+	if (option == 3) {
+		fstream in("data1.txt");
+		Lego.clear();
+		if (in.is_open()) {
+			for (int j = 0;; j++) {
+				if (in.eof()) break;
+				else if (j % 6 == 0)
+					in >> cond.lego;
+				else if (j % 6 == 1)
+					in >> cond.change_x;
+				else if (j % 6 == 2)
+					in >> cond.change_y;
+				else if (j % 6 == 3)
+					in >> cond.change_z;
+				else if (j % 6 == 4)
+					in >> cond.changeangle;
+				else if (j % 6 == 5) {
+					in >> cond.lego_color_index;
+					Lego.push_back(cond);
+				}
+			}
+			printf("data1 open\n");
+			draw();
+		}
+		else {
+			printf("파일이 없습니다.\n");
+		}
+		in.close();
+	}
+	else if (option == 4) {
+		fstream in("data2.txt");
+		Lego.clear();
+		if (in.is_open()) {
+			for (int j = 0;; j++) {
+				if (in.eof()) break;
+				else if (j % 6 == 0)
+					in >> cond.lego;
+				else if (j % 6 == 1)
+					in >> cond.change_x;
+				else if (j % 6 == 2)
+					in >> cond.change_y;
+				else if (j % 6 == 3)
+					in >> cond.change_z;
+				else if (j % 6 == 4)
+					in >> cond.changeangle;
+				else if (j % 6 == 5) {
+					in >> cond.lego_color_index;
+					Lego.push_back(cond);
+				}
+			}
+			printf("data2 open\n");
+			draw();
+		}
+		else {
+			printf("파일이 없습니다.\n");
+		}
+		in.close();
+	}
+	glutPostRedisplay();
+}
 
 void main_menu_function(int option) {
 	printf("Main menu %d \n", option);
 }
 
-
 int main(int argc, char **argv) {
-
-	int submenual;
+	int submenual1, submenual2;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -403,12 +477,19 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(keyboard);
 	glutPostRedisplay();
 	glutReshapeFunc(resize);
+	submenual1 = glutCreateMenu(sub_menu_savetank);
+	glutAddMenuEntry("Save Tank1", 1);
+	glutAddMenuEntry("Save Tank2", 2);
+
+	submenual2 = glutCreateMenu(sub_menu_Loadtank);
+	glutAddMenuEntry("Load Tank1", 3);
+	glutAddMenuEntry("Load Tank2", 4);
 
 	glutCreateMenu(main_menu_function);
-	glutAddMenuEntry("Save Tank", 1);
-	glutAddMenuEntry("Load Tank", 2);
-	glutAddMenuEntry("Go to Game Mode", 3);
-	glutAddMenuEntry("Quit",4);
+	glutAddSubMenu("Save Tank", submenual1);
+	glutAddSubMenu("Load Tank", submenual2);
+	glutAddMenuEntry("Go to Game Mode", 33);
+	glutAddMenuEntry("Quit",44);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	glutMainLoop();
