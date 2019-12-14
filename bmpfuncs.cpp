@@ -1,80 +1,82 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "GL/freeglut.h"
-#include <GL/glext.h>
+
 #include "bmpfuncs.h"
 
-void storeImage(float *imageOut, const char *filename, int rows, int cols, 
-                const char* refFilename) {
+#define VERBOSE false
 
-   FILE *ifp, *ofp;
-   unsigned char tmp;
-   int offset;
-   unsigned char *buffer;
-   int i, j;
+void storeImage(float *imageOut, const char *filename, int rows, int cols,
+	const char* refFilename) {
 
-   int bytes;
+	FILE *ifp, *ofp;
+	unsigned char tmp;
+	int offset;
+	unsigned char *buffer;
+	int i, j;
 
-   int height, width;
+	int bytes;
 
-   ifp = fopen(refFilename, "rb");
-   if(ifp == NULL) {
-      perror(filename);
-      exit(-1);
-   }
+	int height, width;
 
-   fseek(ifp, 10, SEEK_SET);
-   fread(&offset, 4, 1, ifp);
+	ifp = fopen(refFilename, "rb");
+	if (ifp == NULL) {
+		perror("bmpfunc.cpp : error file name ");
+		perror(filename);
+		exit(-1);
+	}
 
-   fseek(ifp, 18, SEEK_SET);
-   fread(&width, 4, 1, ifp);
-   fread(&height, 4, 1, ifp);
+	fseek(ifp, 10, SEEK_SET);
+	fread(&offset, 4, 1, ifp);
 
-   fseek(ifp, 0, SEEK_SET);
+	fseek(ifp, 18, SEEK_SET);
+	fread(&width, 4, 1, ifp);
+	fread(&height, 4, 1, ifp);
 
-   buffer = (unsigned char *)malloc(offset);
-   if(buffer == NULL) {
-      perror("malloc");
-      exit(-1);
-   }
+	fseek(ifp, 0, SEEK_SET);
 
-   fread(buffer, 1, offset, ifp);
+	buffer = (unsigned char *)malloc(offset);
+	if (buffer == NULL) {
+		perror("bmpfunc.cpp : malloc");
+		exit(-1);
+	}
 
-   printf("Writing output image to %s\n", filename);
-   ofp = fopen(filename, "wb");
-   if(ofp == NULL) {
-      perror("opening output file");
-      exit(-1);
-   }
-   bytes = fwrite(buffer, 1, offset, ofp);
-   if(bytes != offset) {
-      printf("error writing header!\n");
-      exit(-1);
-   }
+	fread(buffer, 1, offset, ifp);
 
-   // NOTE bmp formats store data in reverse raster order (see comment in
-   // readImage function), so we need to flip it upside down here.  
-   int mod = width % 4;
-   if(mod != 0) {
-      mod = 4 - mod;
-   }
-   //   printf("mod = %d\n", mod);
-   for(i = height-1; i >= 0; i--) {
-      for(j = 0; j < width; j++) {
-         tmp = (unsigned char)imageOut[i*cols+j];
-         fwrite(&tmp, sizeof(char), 1, ofp);
-      }
-      // In bmp format, rows must be a multiple of 4-bytes.  
-      // So if we're not at a multiple of 4, add junk padding.
-      for(j = 0; j < mod; j++) {
-         fwrite(&tmp, sizeof(char), 1, ofp);
-      }
-   } 
+	printf("bmpfunc.cpp : Writing output image to %s\n", filename);
+	ofp = fopen(filename, "wb");
+	if (ofp == NULL) {
+		perror("bmpfunc.cpp : error opening output file");
+		exit(-1);
+	}
+	bytes = fwrite(buffer, 1, offset, ofp);
+	if (bytes != offset) {
+		printf("bmpfunc.cpp : error writing header!\n");
+		exit(-1);
+	}
 
-   fclose(ofp);
-   fclose(ifp);
+	// NOTE bmp formats store data in reverse raster order (see comment in
+	// readImage function), so we need to flip it upside down here.  
+	int mod = width % 4;
+	if (mod != 0) {
+		mod = 4 - mod;
+	}
 
-   free(buffer);
+	for (i = height - 1; i >= 0; i--) {
+		for (j = 0; j < width; j++) {
+			tmp = (unsigned char)imageOut[i*cols + j];
+			fwrite(&tmp, sizeof(char), 1, ofp);
+		}
+		// In bmp format, rows must be a multiple of 4-bytes.  
+		// So if we're not at a multiple of 4, add junk padding.
+		for (j = 0; j < mod; j++) {
+			fwrite(&tmp, sizeof(char), 1, ofp);
+		}
+	}
+
+	fclose(ofp);
+	fclose(ifp);
+
+	free(buffer);
 }
 
 /*
@@ -91,15 +93,15 @@ uchar* readImageData(const char *filename, int* width, int* height, int* channel
 
 	// Open the file
 	FILE * file = fopen(filename, "rb");
-	if (!file) { printf("Image could not be opened\n"); return 0; }
+	if (!file) { printf("bmpfunc.cpp : Image could not be opened\n"); return 0; }
 
 	if (fread(header, 1, 54, file) != 54) { // If not 54 bytes read : problem
-		printf("Not a correct BMP file\n");
+		printf("bmpfunc.cpp : Not a correct BMP file\n");
 		return false;
 	}
 
 	if (header[0] != 'B' || header[1] != 'M') {
-		printf("Not a correct BMP file\n");
+		printf("bmpfunc.cpp : Not a correct BMP file\n");
 		return 0;
 	}
 
@@ -109,25 +111,32 @@ uchar* readImageData(const char *filename, int* width, int* height, int* channel
 	*width = *(int*)&(header[0x12]);
 	*height = *(int*)&(header[0x16]);
 
-	if (imageSize == 0)    imageSize = (*width) * (*height) * 3; // Assume 3 channels
+	if (imageSize == 0)
+	{
+		printf("bmpfunc.cpp : There is no channel info, assume input image channel as 3\n");
+		*channels = 3;
+		imageSize = (*width) * (*height) * 3; // Assume 3 channels
+	}
 	else {
 		if (imageSize == (*width) * (*height)) {
-			printf("input source : 8bit-img\n");
+			printf("bmpfunc.cpp : Input img : 8bit-img\n");
 			*channels = 1;
 		}
 		else if (imageSize == (*width) * (*height) * 3) {
-			printf("input source : 24bit-img\n");
+			printf("bmpfunc.cpp : input img : 24bit-img\n");
 			*channels = 3;
 		}
-		else {
-			channels = 0;
+		else { // Assume 3 channels
+			*channels = 3;
 		}
 	}
 	if (dataPos == 0)      dataPos = 54; // The BMP header is done that way
 
-	printf("width = %d\n", *width);
-	printf("height = %d\n", *height);
-	printf("imgSize = %d\n", imageSize);
+#if VERBOSE
+	printf("bmpfunc.cpp : width = %d\n", *width);
+	printf("bmpfunc.cpp : height = %d\n", *height);
+	printf("bmpfunc.cpp : imgSize = %d\n", imageSize);
+#endif
 
 	imageData = (uchar*)malloc(imageSize);
 
@@ -162,15 +171,15 @@ float* readImageDataf(const char *filename, int* width, int* height, int* channe
 
 	// Open the file
 	FILE * file = fopen(filename, "rb");
-	if (!file) { printf("Image could not be opened\n"); return 0; }
+	if (!file) { printf("bmpfunc.cpp : Image could not be opened\n"); return 0; }
 
 	if (fread(header, 1, 54, file) != 54) { // If not 54 bytes read : problem
-		printf("Not a correct BMP file\n");
+		printf("bmpfunc.cpp : Not a correct BMP file\n");
 		return false;
 	}
 
 	if (header[0] != 'B' || header[1] != 'M') {
-		printf("Not a correct BMP file\n");
+		printf("bmpfunc.cpp : Not a correct BMP file\n");
 		return 0;
 	}
 
@@ -180,25 +189,32 @@ float* readImageDataf(const char *filename, int* width, int* height, int* channe
 	*width = *(int*)&(header[0x12]);
 	*height = *(int*)&(header[0x16]);
 
-	if (imageSize == 0)    imageSize = (*width) * (*height) * 3; // Assume 3 channels
+	if (imageSize == 0)
+	{
+		printf("bmpfunc.cpp : There is no channel info, assume input image channel as 3\n");
+		*channels = 3;
+		imageSize = (*width) * (*height) * 3; // Assume 3 channels
+	}
 	else {
 		if (imageSize == (*width) * (*height)) {
-			printf("input source : 8bit-img\n");
+			printf("bmpfunc.cpp : input img : 8bit-img\n");
 			*channels = 1;
 		}
 		else if (imageSize == (*width) * (*height) * 3) {
-			printf("input source : 24bit-img\n");
+			printf("bmpfunc.cpp : input img : 24bit-img\n");
 			*channels = 3;
 		}
-		else {
-			channels = 0;
+		else { // Assume 3 channels
+			*channels = 3;
 		}
 	}
 	if (dataPos == 0)      dataPos = 54; // The BMP header is done that way
 
-	printf("width = %d\n", *width);
-	printf("height = %d\n", *height);
-	printf("imgSize = %d\n", imageSize);
+#if VERBOSE
+	printf("bmpfunc.cpp : width = %d\n", *width);
+	printf("bmpfunc.cpp : height = %d\n", *height);
+	printf("bmpfunc.cpp : imgSize = %d\n", imageSize);
+#endif
 
 	imageData = (uchar*)malloc(imageSize);
 
@@ -218,18 +234,18 @@ float* readImageDataf(const char *filename, int* width, int* height, int* channe
 		}
 	}
 
-   // Input image on the host
-   float* floatImage = NULL;
-   floatImage = (float*)malloc(sizeof(float)*imageSize);
+	// Input image on the host
+	float* floatImage = NULL;
+	floatImage = (float*)malloc(sizeof(float)*imageSize);
 
-   // Convert the BMP image to float (not required)
-   for(int i = 0; i < *height; i++) {
-      for(int j = 0; j < *width; j++) {
-		  for(int c=0; c< *channels; c++)
-			floatImage[((*channels)*i*(*width)+j)+c] = (float)imageData[((*channels) * i*(*width) + j) + c];
-      }
-   }
+	// Convert the BMP image to float (not required)
+	for (int i = 0; i < *height; i++) {
+		for (int j = 0; j < *width; j++) {
+			for (int c = 0; c < *channels; c++)
+				floatImage[((*channels)*i*(*width) + j) + c] = (float)imageData[((*channels) * i*(*width) + j) + c];
+		}
+	}
 
-   free(imageData);
-   return floatImage;
+	free(imageData);
+	return floatImage;
 }
