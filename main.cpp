@@ -22,13 +22,19 @@ double eyz = r * cos(the);
 
 struct Gamecondition {
 	int lego;
-	float change_x;
-	float change_y;
-	float change_z;
+	double change_x;
+	double change_y;
+	double change_z;
 	double changeangle;
 	int lego_color_index;
 	int text_index;
 	int text_button;
+	double min_x;
+	double max_x;
+	double min_y;
+	double max_y;
+	double min_z;
+	double max_z;
 };
 
 Gamecondition gm;
@@ -246,32 +252,50 @@ void Gamekeyboard(unsigned char key, int x, int y) {
 }
 
 void sub_Game_Loadtank1(int option) {
-	fstream in("data1.txt");
+	fstream in("data2.txt");
 	Game1.clear();
 	if (in.is_open()) {
 		for (int j = 0;; j++) {
 			if (in.eof()) break;
-			else if (j % 8 == 0)
+			else if (j % 14 == 0)
 				in >> gm.lego;
-			else if (j % 8 == 1)
+			else if (j % 14 == 1)
 				in >> gm.change_x;
-			else if (j % 8 == 2)
+			else if (j % 14 == 2)
 				in >> gm.change_y;
-			else if (j % 8 == 3)
+			else if (j % 14 == 3)
 				in >> gm.change_z;
-			else if (j % 8 == 4)
+			else if (j % 14 == 4)
 				in >> gm.changeangle;
-			else if (j % 8 == 5)
+			else if (j % 14 == 5)
 				in >> gm.lego_color_index;
-			else if (j % 8 == 6)
+			else if (j % 14 == 6)
 				in >> gm.text_index;
-			else if (j % 8 == 7) {
+			else if (j % 14 == 7) {
 				in >> gm.text_button;
+			}
+			else if (j % 14 == 8) {
+				in >> gm.max_x;
+			}
+			else if (j % 14 == 9) {
+				in >> gm.min_x;
+			}
+			else if (j % 14 == 10) {
+				in >> gm.max_y;
+			}
+			else if (j % 14 == 11) {
+				in >> gm.min_y;
+			}
+			else if (j % 14 == 12) {
+				in >> gm.max_z;
+			}
+			else if (j % 14 == 13) {
+				in >> gm.min_z;
 				Game1.push_back(gm);
-				Game_draw();
 			}
 		}
 		printf("data1 open\n");
+		Game_draw();
 	}
 	else {
 		printf("파일이 없습니다.\n");
@@ -290,12 +314,12 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(100, 50);
 	glutCreateWindow("Mini_project");
 	//sub_Game_Loadtank1();
-	MakeLego_main();
+	//MakeLego_main();
 	
-	//init();
+	init();
 	//sub_Game_Loadtank1();
 	//sub_Game_Loadtank2();
-	/*
+	
 	glutDisplayFunc(Game_draw);
 	glutReshapeFunc(Gameresize);
 	glutKeyboardFunc(Gamekeyboard);
@@ -303,7 +327,7 @@ int main(int argc, char **argv) {
 	glutCreateMenu(sub_Game_Loadtank1);
 	glutAddMenuEntry("Game Start", 3);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
-	*/
+	
 	glutPostRedisplay();
 	glutMainLoop();
 	

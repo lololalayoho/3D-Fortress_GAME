@@ -41,29 +41,40 @@ int picture_index, color_index, merge_index;
 
 struct condition {
 	int lego;
-	float change_x;
-	float change_y;
-	float change_z;
+	double change_x;
+	double change_y;
+	double change_z;
 	double changeangle;
 	int lego_color_index;
 	int text_index;
 	int text_button;
+	double min_x;
+	double max_x;
+	double min_y;
+	double max_y;
+	double min_z;
+	double max_z;
 };
 struct color {
 	float R;
 	float G;
 	float B;
 };
-vector<condition> Lego; condition cond; float angel1 = 0; ObjParser object; ObjParser obj;int text_index;
+struct collision {
+	double min_x;
+	double max_x;
+	double min_y;
+	double max_y;
+	double min_z;
+	double max_z;
+};
+vector<condition> Lego; condition cond;float angel1 = 0; ObjParser object; int text_index;
 void setTextureMapping();
 GLuint texture[6];
+collision box[50] = { {1.4,2.5,0,0.5,1.5,1.5}, {1.4,2.5,0,0.5,1.5,1.5}, {1.3,1.4,0,0.5,0.35,0.35},{0.6,0.6,0,1.2,0.25,0.25}, {2.5,2.5,0.75,0.75,0.75,0.75}, {0.12,0.12,0,2.4,1.2,1.2},{0.9,1,0,0.2,1,1},{0.9,1,0,0.2,1,1},{1,1,0,0.2,1,1},{0.1,3.1,0,1.88,0.3,0.3},{0,2.7,0,2,0.5,0.5},{-1,1,0,1.5,0.75,0.75} };
 char picture[][50] = { "image/body2-1.obj","image/body2-2.obj","image/body2-3.obj","image/Leg1.obj","image/Leg2.obj","image/Leg3.obj","image/body1-1.obj","image/body1-2.obj","image/body1-3.obj","image/head1-1.obj","image/head1-2.obj","image/head1-3.obj" };
 color paint[50] = { {1.0f,0.0f,0.0f},{0.0f,1.0f,0.0f},{ 0.0f,0.0f,1.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,1.0f},{0.5f,0.5f,0.5f},{0.5f,0.0f,0.5f},{1.0f,0.0f,1.0f},{0.0f,0.5f,0.5f} };//red, green, blue, yellow, aqua, gray, purple ,fuchsia, teal;
 
-int value = 12345678943;
-void print() {
-	printf("%d\n",value);
-}
 void init_makeLego(void) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0f);
@@ -284,7 +295,7 @@ void draw_preview() {
 void draw_merge_block() {
 	glDisable(GL_TEXTURE_2D);
 	glMatrixMode(GL_MODELVIEW);
-	glViewport(300, 0, 800, 500);
+	glViewport(300, 100, 800, 500);
 	glLoadIdentity();
 	gluLookAt(eyex, eyez, eyey, 0, 0, 0, xup, yup, zup); //회전하기
 	glPushMatrix();
@@ -303,6 +314,7 @@ void draw_merge_block() {
 			glEnable(GL_TEXTURE_2D);
 		}
 		else if (Lego[i].text_button == 1) { //object 그리기
+			glColor4f(1.0f, 1.0f, 1.0f,1.0f);
 			draw_obj_with_texture(&object, Lego[i].text_index);
 		}
 		glPopMatrix();
@@ -322,6 +334,19 @@ void draw(void) {
 	draw_merge_block();
 	draw_axies();
 	glutSwapBuffers();
+}
+
+bool check_collision(condition a, condition b) {
+
+	if (((a.max_y <= b.max_y) && (a.max_y >= b.min_y)) || ((a.max_y >= b.max_y) && (a.min_y <= b.max_y))) {
+		if (((a.max_z <= b.max_z) && (a.max_z >= b.min_z)) || ((a.max_z >= b.max_z) && (a.min_z <= b.max_z))) {
+			if (((a.max_x <= b.max_x) && (a.max_x >= b.min_x)) || ((a.max_x >= b.max_x) && (a.min_x <= b.max_x))) {
+				return false;
+			}
+		}
+	}
+	
+	return true;
 }
 
 void mouse_move(int x, int y) {
@@ -368,9 +393,14 @@ void keyboard(unsigned char key, int x, int y) {
 		Lego[Lego.size() - 1].lego_color_index = color_index;
 	}
 	else if (key == VK_SPACE) {
-		int c_x = 0, c_y = 0, c_z = 0, c_an = 0;
 		merge_index = picture_index;
 		cond.lego = merge_index;
+		cond.max_x = 3 + box[merge_index].max_x;
+		cond.min_x = 3 -box[merge_index].min_x;
+		cond.max_y =  + box[merge_index].max_y;
+		cond.min_y =  -box[merge_index].min_y;
+		cond.max_z =  + box[merge_index].max_z;
+		cond.min_z =  -box[merge_index].min_z;
 		Lego.push_back(cond);
 	}
 	else if (key == 't') {
@@ -380,22 +410,112 @@ void keyboard(unsigned char key, int x, int y) {
 		Lego[Lego.size() - 1].text_index = text_index;
 	}
 	else if (key == 'l') {
+		bool flag;
 		Lego[Lego.size() - 1].change_z = Lego[Lego.size() - 1].change_z - 0.1;
+		Lego[Lego.size() - 1].min_z = Lego[Lego.size() - 1].min_z - 0.1;
+		Lego[Lego.size() - 1].max_z = Lego[Lego.size() - 1].max_z - 0.1;
+		for (int i = 0; i < Lego.size() - 1; i++) { //모든 도형에 대해 체크
+			flag = check_collision(Lego[Lego.size() - 1], Lego[i]);
+			if (flag == false) {
+				if ((Lego[Lego.size() - 1].changeangle) == 0 || (Lego[Lego.size() - 1].changeangle == 180)) {
+					Lego[Lego.size() - 1].change_z = Lego[i].change_z + (box[Lego[Lego.size() - 1].lego].max_z + box[Lego[i].lego].min_z);
+				}
+				else if ((Lego[Lego.size() - 1].changeangle) == 90 || (Lego[Lego.size() - 1].changeangle == 270)) {
+					Lego[Lego.size() - 1].change_z = Lego[i].change_z + (box[Lego[Lego.size() - 1].lego].max_x + box[Lego[i].lego].max_x);
+				}
+				Lego[Lego.size() - 1].min_z = Lego[Lego.size() - 1].min_z + 0.1;
+				Lego[Lego.size() - 1].max_z = Lego[Lego.size() - 1].max_z + 0.1;
+			}
+		}
 	}
 	else if (key == 'j') {
+		bool flag;
 		Lego[Lego.size() - 1].change_z = Lego[Lego.size() - 1].change_z + 0.1;
+		Lego[Lego.size() - 1].min_z = Lego[Lego.size() - 1].min_z + 0.1;
+		Lego[Lego.size() - 1].max_z = Lego[Lego.size() - 1].max_z + 0.1;
+		for (int i = 0; i < Lego.size() - 1; i++) { //모든 도형에 대해 체크
+			flag = check_collision(Lego[Lego.size() - 1], Lego[i]);
+			if (flag == false) {
+				if ((Lego[Lego.size() - 1].changeangle) == 0 || (Lego[Lego.size() - 1].changeangle == 180)) {
+					Lego[Lego.size() - 1].change_z = Lego[i].change_z - (box[Lego[Lego.size() - 1].lego].min_z + box[Lego[i].lego].max_z);
+				}
+				else if ((Lego[Lego.size() - 1].changeangle) == 90 || (Lego[Lego.size() - 1].changeangle == 270)) {
+					Lego[Lego.size() - 1].change_z = Lego[i].change_z - (box[Lego[Lego.size() - 1].lego].max_x + box[Lego[i].lego].max_x);
+				}
+				Lego[Lego.size() - 1].min_z = Lego[Lego.size() - 1].min_z - 0.1;
+				Lego[Lego.size() - 1].max_z = Lego[Lego.size() - 1].max_z - 0.1;
+			}
+		}
 	}
 	else if (key == 'k') {
+		bool flag;
 		Lego[Lego.size() - 1].change_x = Lego[Lego.size() - 1].change_x + 0.1;
+		Lego[Lego.size() - 1].min_x = Lego[Lego.size() - 1].min_x + 0.1;
+		Lego[Lego.size() - 1].max_x = Lego[Lego.size() - 1].max_x + 0.1;
+		for (int i = 0; i < Lego.size() - 1; i++) { //모든 도형에 대해 체크
+			flag = check_collision(Lego[Lego.size() - 1], Lego[i]);
+			if (flag == false) {
+				if ((Lego[Lego.size() - 1].changeangle) == 0 || (Lego[Lego.size() - 1].changeangle == 180)) {
+					Lego[Lego.size() - 1].change_x = Lego[i].change_x - (box[Lego[Lego.size() - 1].lego].max_x + box[Lego[i].lego].min_x);
+				}
+				else if ((Lego[Lego.size() - 1].changeangle) == 90 || (Lego[Lego.size() - 1].changeangle == 270)) {
+					Lego[Lego.size() - 1].change_z = Lego[i].change_z - (box[Lego[Lego.size() - 1].lego].max_z + box[Lego[i].lego].max_z);
+				}
+				Lego[Lego.size() - 1].min_x = Lego[Lego.size() - 1].min_x - 0.1;
+				Lego[Lego.size() - 1].max_x = Lego[Lego.size() - 1].max_x - 0.1;
+			}
+		}
 	}
 	else if (key == 'i') {
+		bool flag;
 		Lego[Lego.size() - 1].change_x = Lego[Lego.size() - 1].change_x - 0.1;
+		Lego[Lego.size() - 1].min_x = Lego[Lego.size() - 1].min_x - 0.1;
+		Lego[Lego.size() - 1].max_x = Lego[Lego.size() - 1].max_x - 0.1;
+		for (int i = 0; i < Lego.size() - 1; i++) { //모든 도형에 대해 체크
+			flag = check_collision(Lego[Lego.size() - 1], Lego[i]);
+			if (flag == false) {
+				if ((Lego[Lego.size() - 1].changeangle) == 0 || (Lego[Lego.size() - 1].changeangle == 180)) {
+					Lego[Lego.size() - 1].change_x = Lego[i].change_x + (box[Lego[Lego.size() - 1].lego].min_x + box[Lego[i].lego].max_x);
+				}
+				else if ((Lego[Lego.size() - 1].changeangle) == 90 || (Lego[Lego.size() - 1].changeangle == 270)) {
+					Lego[Lego.size() - 1].change_z = Lego[i].change_z + (box[Lego[Lego.size() - 1].lego].max_z + box[Lego[i].lego].max_z);
+				}
+				Lego[Lego.size() - 1].min_x = Lego[Lego.size() - 1].min_x + 0.1;
+				Lego[Lego.size() - 1].max_x = Lego[Lego.size() - 1].max_x + 0.1;
+			}
+		}
 	}
 	else if (key == ',') {
+		bool flag;
 		Lego[Lego.size() - 1].change_y = Lego[Lego.size() - 1].change_y + 0.1;
+		Lego[Lego.size() - 1].min_y = Lego[Lego.size() - 1].min_y + 0.1;
+		Lego[Lego.size() - 1].max_y = Lego[Lego.size() - 1].max_y + 0.1;
+		for (int i = 0; i < Lego.size() - 1; i++) { //모든 도형에 대해 체크
+			flag = check_collision(Lego[Lego.size() - 1], Lego[i]);
+			if (flag == false) {
+				if ((Lego[Lego.size() - 1].changeangle) == 0 || (Lego[Lego.size() - 1].changeangle == 180)) {
+					Lego[Lego.size() - 1].change_y = Lego[i].change_y - (box[Lego[Lego.size() - 1].lego].max_y + box[Lego[i].lego].max_y);
+				}
+				Lego[Lego.size() - 1].min_y = Lego[Lego.size() - 1].min_y - 0.1;
+				Lego[Lego.size() - 1].max_y = Lego[Lego.size() - 1].max_y - 0.1;
+			}
+		}
 	}
 	else if (key == '.') {
-		Lego[Lego.size() - 1].change_y = Lego[Lego.size() - 1].change_y - 0.1;
+	bool flag;
+	Lego[Lego.size() - 1].change_y = Lego[Lego.size() - 1].change_y - 0.1;
+	Lego[Lego.size() - 1].min_y = Lego[Lego.size() - 1].min_y - 0.1;
+	Lego[Lego.size() - 1].max_y = Lego[Lego.size() - 1].max_y - 0.1;
+	for (int i = 0; i < Lego.size() - 1; i++) { //모든 도형에 대해 체크
+		flag = check_collision(Lego[Lego.size() - 1], Lego[i]);
+		if (flag == false) {
+			if ((Lego[Lego.size() - 1].changeangle) == 0 || (Lego[Lego.size() - 1].changeangle == 180)) {
+				Lego[Lego.size() - 1].change_y = Lego[i].change_y + (box[Lego[Lego.size() - 1].lego].min_y + box[Lego[i].lego].max_y);
+			}
+			Lego[Lego.size() - 1].min_y = Lego[Lego.size() - 1].min_y + 0.1;
+			Lego[Lego.size() - 1].max_y = Lego[Lego.size() - 1].max_y + 0.1;
+		}
+	}
 	}
 	else if (key == '9') {
 		Lego[Lego.size() - 1].changeangle = Lego[Lego.size() - 1].changeangle + 90;
@@ -463,6 +583,12 @@ void sub_menu_savetank(int option) {
 				out << Lego[i].lego_color_index << endl;
 				out << Lego[i].text_index << endl;
 				out << Lego[i].text_button << endl;
+				out << Lego[i].max_x << endl;
+				out << Lego[i].min_x << endl;
+				out << Lego[i].max_y << endl;
+				out << Lego[i].min_y << endl;
+				out << Lego[i].max_z << endl;
+				out << Lego[i].min_z << endl;
 			}
 			printf("data1 save\n");
 		}
@@ -481,6 +607,12 @@ void sub_menu_savetank(int option) {
 				out << Lego[i].lego_color_index << endl;
 				out << Lego[i].text_index << endl;
 				out << Lego[i].text_button << endl;
+				out << Lego[i].max_x << endl;
+				out << Lego[i].min_x << endl;
+				out << Lego[i].max_y << endl;
+				out << Lego[i].min_y << endl;
+				out << Lego[i].max_z << endl;
+				out << Lego[i].min_z << endl;
 			}
 			printf("data2 save\n");
 		}
@@ -497,22 +629,40 @@ void sub_menu_Loadtank(int option) {
 		if (in.is_open()) {
 			for (int j = 0;; j++) {
 				if (in.eof()) break;
-				else if (j % 8 == 0)
+				else if (j % 14 == 0)
 					in >> cond.lego;
-				else if (j % 8 == 1)
+				else if (j % 14 == 1)
 					in >> cond.change_x;
-				else if (j % 8 == 2)
+				else if (j % 14 == 2)
 					in >> cond.change_y;
-				else if (j % 8 == 3)
+				else if (j % 14 == 3)
 					in >> cond.change_z;
-				else if (j % 8 == 4)
+				else if (j % 14 == 4)
 					in >> cond.changeangle;
-				else if (j % 8 == 5)
+				else if (j % 14 == 5)
 					in >> cond.lego_color_index;
-				else if (j % 8 == 6)
+				else if (j % 14 == 6)
 					in >> cond.text_index;
-				else if (j % 8 == 7) {
+				else if (j % 14 == 7) {
 					in >> cond.text_button;
+				}
+				else if (j % 14 == 8) {
+					in >> cond.max_x;
+				}
+				else if (j % 14 == 9) {
+					in >> cond.min_x;
+				}
+				else if (j % 14 == 10) {
+					in >> cond.max_y;
+				}
+				else if (j % 14 == 11) {
+					in >> cond.min_y;
+				}
+				else if (j % 14 == 12) {
+					in >> cond.max_z;
+				}
+				else if (j % 14 == 13) {
+					in >> cond.min_z;
 					Lego.push_back(cond);
 				}
 			}
@@ -530,22 +680,40 @@ void sub_menu_Loadtank(int option) {
 		if (in.is_open()) {
 			for (int j = 0;; j++) {
 				if (in.eof()) break;
-				else if (j % 8 == 0)
+				else if (j % 14 == 0)
 					in >> cond.lego;
-				else if (j % 8 == 1)
+				else if (j % 14 == 1)
 					in >> cond.change_x;
-				else if (j % 8 == 2)
+				else if (j % 14 == 2)
 					in >> cond.change_y;
-				else if (j % 8 == 3)
+				else if (j % 14 == 3)
 					in >> cond.change_z;
-				else if (j % 8 == 4)
+				else if (j % 14 == 4)
 					in >> cond.changeangle;
-				else if (j % 8 == 5)
+				else if (j % 14 == 5)
 					in >> cond.lego_color_index;
-				else if (j % 8 == 6)
+				else if (j % 14 == 6)
 					in >> cond.text_index;
-				else if (j % 8 == 7) {
+				else if (j % 14 == 7) {
 					in >> cond.text_button;
+				}
+				else if (j % 14 == 8) {
+					in >> cond.max_x;
+				}
+				else if (j % 14 == 9) {
+					in >> cond.min_x;
+				}
+				else if (j % 14 == 10) {
+					in >> cond.max_y;
+				}
+				else if (j % 14 == 11) {
+					in >> cond.min_y;
+				}
+				else if (j % 14 == 12) {
+					in >> cond.max_z;
+				}
+				else if (j % 14 == 13) {
+					in >> cond.min_z;
 					Lego.push_back(cond);
 				}
 			}
