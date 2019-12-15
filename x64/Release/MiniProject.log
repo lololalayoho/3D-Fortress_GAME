@@ -1,15 +1,25 @@
 ﻿  main.cpp
 e:\computer_grapic\miniproject\miniproject\objparser.h(180): warning C4477: 'fprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'입니다.
 e:\computer_grapic\miniproject\miniproject\objparser.h(218): warning C4267: 'return': 'size_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-e:\computer_grapic\miniproject\miniproject\make_lego.h(89): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
-e:\computer_grapic\miniproject\miniproject\make_lego.h(115): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-e:\computer_grapic\miniproject\miniproject\make_lego.h(138): warning C4244: '인수': 'int'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-e:\computer_grapic\miniproject\miniproject\make_lego.h(307): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-e:\computer_grapic\miniproject\miniproject\main.cpp(163): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-e:\computer_grapic\miniproject\miniproject\main.cpp(310): warning C4101: 'Gamesubmenual1' :참조되지 않은 지역 변수입니다.
+e:\computer_grapic\miniproject\miniproject\make_lego.h(139): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+e:\computer_grapic\miniproject\miniproject\make_lego.h(166): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\make_lego.h(203): warning C4244: '인수': 'int'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\make_lego.h(372): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(13): warning C4838: 'double'에서 'GLfloat'(으)로의 변환에는 축소 변환이 필요합니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(13): warning C4244: '초기화 중': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(14): warning C4838: 'double'에서 'GLfloat'(으)로의 변환에는 축소 변환이 필요합니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(14): warning C4244: '초기화 중': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(95): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(102): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(141): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(148): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(184): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(214): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(284): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+e:\computer_grapic\miniproject\miniproject\main.cpp(292): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   코드를 생성하고 있습니다.
-  3 of 514 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
+  0 of 576 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   MiniProject.vcxproj -> E:\computer_grapic\MiniProject\x64\Release\MiniProject.exe
