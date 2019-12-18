@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="bmpfuncs.h" />
     <ClInclude Include="make_Lego.h" />
+    <ClInclude Include="mapping.h" />
     <ClInclude Include="ObjParser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

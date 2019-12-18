@@ -1,20 +1,20 @@
 #ifndef  MAKE_LEGO_H
 #define  MAKE_LEGO_H
-
+#pragma comment(lib, "winmm.lib")
 #include "bmpfuncs.h"
 #include <iostream>
 #include <vector>
 #include <GL/freeglut.h>
 #include <stdlib.h>
 #include <fstream>
+#include <Windows.h>
+#include <Mmsystem.h>
+#include "mapping.h"
 #include "ObjParser.h"
 #include "GL/glext.h"
 #define M_PI 3.14159265358979323846
 using namespace std;
-
-
 //-------------Game mode-----------//
-
 struct Gamecondition {
 	int lego;
 	double change_x;
@@ -31,25 +31,26 @@ struct Gamecondition {
 	double min_z;
 	double max_z;
 };
-Gamecondition gm;
-GLuint texBackground[6]; vector<Gamecondition> Game1; vector<Gamecondition> Game2;
+Gamecondition gm; int map_toggle;
+vector<Gamecondition> Game1; 
+vector<Gamecondition> Game2;
 extern void Game_draw();
 extern void cubeTextureMapping();
 extern void sub_Game_Loadtank1();
 extern void sub_Game_Loadtank2();
-extern void changeView1();
-extern void changeView2();
+extern void skyboxMapping();
+extern void draw_canon();
 //--------------Player1회전 위치-----------//
 int x_up1 = 0;
 int y_up1 = 1;
 int z_up1 = 0;
-double half1 = 25;
+double half1 = 20;
 double cha1 = 5 * (M_PI / 180);
 double pi1 = (M_PI / 180);
 double the1 = (M_PI / 180);
 double eyx1 = half1 * sin(the1)*cos(pi1);
-double eyy1 = half1 * sin(the1)*sin(pi1);
-double eyz1 = half1 * cos(the1);
+double eyy1 = half1 * sin(pi1);
+double eyz1 = half1 * cos(the1)*cos(pi1);
 //--------------Player2회전 위치-----------//
 int x_up2 = 0;
 int y_up2 = 1;
@@ -117,12 +118,14 @@ struct collision {
 	double min_z;
 	double max_z;
 };
-vector<condition> Lego; condition cond; float angel1 = 0; float angel2; float angel3; ObjParser object; int text_index; int Gamemode; int situation; double move_theta;
-void setTextureMapping();
-GLuint texture[6];
-collision box[50] = { {1.4,2.5,0,0.5,1.5,1.5}, {1.4,2.5,0,0.5,1.5,1.5}, {0.35,0.35,0,0.5,1.3,1.4},{0.6,0.6,0,1.2,0.25,0.25}, {2.5,2.5,0.75,0.75,0.75,0.75}, {0.12,0.12,0,2.4,1.2,1.2},{0.9,1,0,0.2,1,1},{0.9,1,0,0.2,1,1},{1,1,0,0.2,1,1},{0.1,3.1,0,1.88,0.3,0.3},{0,2.7,0,2,0.5,0.5},{-1,1,0,1.5,0.75,0.75} };
-char picture[][50] = { "image/body2-1.obj","image/body2-2.obj","image/body2-3.obj","image/Leg1.obj","image/Leg2.obj","image/Leg3.obj","image/body1-1.obj","image/body1-2.obj","image/body1-3.obj","image/head1-1.obj","image/head1-2.obj","image/head1-3.obj" };
+vector<condition> Lego; condition cond; float angel1 = 0; float angel2; float angel3; ObjParser object; int text_index; int Gamemode; int situation; double move_theta; double move_theta2;
+void setTextureMapping(); double value1; double value2; int canon_toggle; ObjParser can; int player_mode;
+condition canon1; condition canon2; double canon_angle; int canon_count1; int canon_count2; int vs;
+GLuint texture[6]; GLfloat light_position[] = { eyex,eyey,eyez,1.0 };
+collision box[50] = { {1.4,2.5,0.5,0.5,1.5,1.5}, {1.4,2.5,0.5,0.5,1.5,1.5}, {0.35,0.35,0.5,0.5,1,1},{0.6,0.6,0.6,0.6,0.25,0.25}, {2.5,2.5,0.75,0.75,0.75,0.75}, {0.12,0.12,1.2,1.2,1.2,1.2},{0.9,1,0.1,0.1,1,1},{0.9,1,0.1,0.1,1,1},{1,1,0,0.05,1,1},{1.5,1.5,0,1,0.3,0.3},{0,2.6,0,1,0.5,0.5},{0.5,0.5,0.75,0.75,0.75,0.75} };
+char picture[][50] = { "image/body2-1.obj","image/body2-2.obj","image/body2-3.obj","image/Leg1.obj","image/Leg2.obj","image/Leg3.obj","image/body1-1.obj","image/body1-2.obj","image/body1-3.obj","image/head1-1.obj","image/head1-2.obj","image/head1-3.obj","image/canon.obj" };
 color paint[50] = { {1.0f,0.0f,0.0f},{0.0f,1.0f,0.0f},{ 0.0f,0.0f,1.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,1.0f},{0.5f,0.5f,0.5f},{0.5f,0.0f,0.5f},{1.0f,0.0f,1.0f},{0.0f,0.5f,0.5f} };//red, green, blue, yellow, aqua, gray, purple ,fuchsia, teal;
+void draw_obj(ObjParser *object);
 
 void init_makeLego(void) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -159,6 +162,7 @@ void init_makeLego(void) {
 	glEnable(GL_TEXTURE_2D);
 	cubeTextureMapping();
 	setTextureMapping();
+	skyboxMapping();
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
@@ -177,7 +181,31 @@ void idle(void) {
 		if (angel3 != 0 && (int)angel3 % 10 == 0) {
 			situation = 0;
 		}
-		if (angel3 > 360) { angel3 -= 360; }
+	}
+	if (canon_toggle == 1) {
+		canon_angle = canon_angle + 1;
+		if (canon_angle > 180) {
+			canon_angle -= 180;
+			if (player_mode == 2) {
+				for (int i = 0; i < Game1.size(); i++) {
+					if ((int)Game1[i].change_x*(-1) -1 >= canon.change_x && (int)Game1[i].change_x*(-1) + 1 <= canon.change_x)
+						vs = 2;
+				}
+			}
+			else if (player_mode == 1) {
+				for (int i = 0; i < Game2.size(); i++) {
+					if ((int)Game2[i].change_x*(-1) - 2 <= canon.change_x && (int)Game2[i].change_x*(-1) + 2 >= canon.change_x)
+						vs = 1;
+				}
+			}
+			canon_toggle = 0;
+
+			if (player_mode == 1)
+				player_mode = 2;
+			else if (player_mode == 2)
+				player_mode = 1;
+
+		}
 	}
 }
 
@@ -341,6 +369,17 @@ void draw_text() {
 	glEnable(GL_TEXTURE_2D);
 	glFlush();
 }
+void draw_vs() {
+	glDisable(GL_TEXTURE_2D);
+	glViewport(0, 300, 600, 300);
+	glLoadIdentity();
+	if(vs == 2)
+		draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "PLAYER 1 WIN ", 0, 1);
+	else if(vs ==1)
+		draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "PLAYER 2 WIN ", 0, 1);
+	glEnable(GL_TEXTURE_2D);
+	glFlush();
+}
 
 void draw_preview() {
 	glDisable(GL_TEXTURE_2D);
@@ -366,7 +405,6 @@ void draw_merge_block() {
 	glPushMatrix();
 	glRotated(camera_angle_v, 1.0, 0.0, 0.0);
 	glRotated(camera_angle_h, 0.0, 1.0, 0.0);
-	glTranslatef(3.0f, 0.0f, 0.0f);
 	for (int i = 0; i < Lego.size(); i++) {
 		glPushMatrix();
 		glTranslatef(Lego[i].change_x, Lego[i].change_y, Lego[i].change_z);
@@ -379,8 +417,10 @@ void draw_merge_block() {
 			glEnable(GL_TEXTURE_2D);
 		}
 		else if (Lego[i].text_button == 1) { //object 그리기
+			glEnable(GL_TEXTURE_2D);
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			draw_obj_with_texture(&object, Lego[i].text_index);
+			glDisable(GL_TEXTURE_2D);
 		}
 		glPopMatrix();
 	}
@@ -395,13 +435,43 @@ void draw(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	if (Gamemode == 0) {
+		glPushMatrix();
+		glDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_T);
+		glDisable(GL_TEXTURE_GEN_R);
+		glDisable(GL_TEXTURE_CUBE_MAP);
 		draw_preview();
 		draw_text();
 		draw_merge_block();
 		draw_axies();
+		glPopMatrix();
+
 	}
 	else if (Gamemode == 1) {
-		Game_draw();
+		glPushMatrix();
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+		glDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_T);
+		glDisable(GL_TEXTURE_GEN_R);
+		glDisable(GL_TEXTURE_CUBE_MAP);
+		if (player_mode == 1) {
+			glPushMatrix();			
+			Game_draw();
+			draw_canon();
+			if (vs == 1)
+				draw_vs();
+			glPopMatrix();
+		}
+		else if (player_mode == 2){
+			glPushMatrix();	
+			Game_draw();
+			draw_canon();
+			if (vs == 2)
+				draw_vs();
+			glPopMatrix();
+		}
+		glPopMatrix();
 	}
 	glutSwapBuffers();
 }
@@ -435,8 +505,6 @@ void mouse(int button, int state, int x, int y) {
 		eyex = r * sin(thean)*cos(pian);
 		eyey = r * sin(thean)*sin(pian);
 		eyez = r * cos(thean);
-		changeView1();
-		changeView2();
 	}
 	else if (button == 3) {
 		r = r - 1;
@@ -448,8 +516,6 @@ void mouse(int button, int state, int x, int y) {
 		eyex = r * sin(thean)*cos(pian);
 		eyey = r * sin(thean)*sin(pian);
 		eyez = r * cos(thean);
-		changeView1();
-		changeView2();
 	}
 	else if ((state == GLUT_DOWN) && (button == GLUT_LEFT_BUTTON)) {
 		dragging = 1;
@@ -481,6 +547,7 @@ void keyboard(unsigned char key, int x, int y) {
 			cond.min_y = -box[merge_index].min_y;
 			cond.max_z = +box[merge_index].max_z;
 			cond.min_z = -box[merge_index].min_z;
+			cond.change_x = 3;
 			Lego.push_back(cond);
 		}
 		else if (key == 't') {
@@ -520,7 +587,7 @@ void keyboard(unsigned char key, int x, int y) {
 						Lego[Lego.size() - 1].change_z = Lego[i].change_z - (box[Lego[Lego.size() - 1].lego].min_z + box[Lego[i].lego].max_z);
 					}
 					else if ((Lego[Lego.size() - 1].changeangle) == 90 || (Lego[Lego.size() - 1].changeangle == 270)) {
-						Lego[Lego.size() - 1].change_z = Lego[i].change_z - (box[Lego[Lego.size() - 1].lego].max_x + box[Lego[i].lego].max_z);
+						Lego[Lego.size() - 1].change_z = Lego[i].change_z - (box[Lego[Lego.size() - 1].lego].min_x + box[Lego[i].lego].max_z);
 					}
 					Lego[Lego.size() - 1].min_z = Lego[Lego.size() - 1].min_z - 0.1;
 					Lego[Lego.size() - 1].max_z = Lego[Lego.size() - 1].max_z - 0.1;
@@ -539,7 +606,7 @@ void keyboard(unsigned char key, int x, int y) {
 						Lego[Lego.size() - 1].change_x = Lego[i].change_x - (box[Lego[Lego.size() - 1].lego].max_x + box[Lego[i].lego].min_x);
 					}
 					else if ((Lego[Lego.size() - 1].changeangle) == 90 || (Lego[Lego.size() - 1].changeangle == 270)) {
-						Lego[Lego.size() - 1].change_z = Lego[i].change_z - (box[Lego[Lego.size() - 1].lego].max_z + box[Lego[i].lego].max_z);
+						Lego[Lego.size() - 1].change_z = Lego[i].change_z - (box[Lego[Lego.size() - 1].lego].max_x + box[Lego[i].lego].max_z);
 					}
 					Lego[Lego.size() - 1].min_x = Lego[Lego.size() - 1].min_x - 0.1;
 					Lego[Lego.size() - 1].max_x = Lego[Lego.size() - 1].max_x - 0.1;
@@ -558,7 +625,7 @@ void keyboard(unsigned char key, int x, int y) {
 						Lego[Lego.size() - 1].change_x = Lego[i].change_x + (box[Lego[Lego.size() - 1].lego].min_x + box[Lego[i].lego].max_x);
 					}
 					else if ((Lego[Lego.size() - 1].changeangle) == 90 || (Lego[Lego.size() - 1].changeangle == 270)) {
-						Lego[Lego.size() - 1].change_z = Lego[i].change_z + (box[Lego[Lego.size() - 1].lego].max_z + box[Lego[i].lego].max_z);
+						Lego[Lego.size() - 1].change_z = Lego[i].change_z + (box[Lego[Lego.size() - 1].lego].max_x + box[Lego[i].lego].max_z);
 					}
 					Lego[Lego.size() - 1].min_x = Lego[Lego.size() - 1].min_x + 0.1;
 					Lego[Lego.size() - 1].max_x = Lego[Lego.size() - 1].max_x + 0.1;
@@ -573,9 +640,7 @@ void keyboard(unsigned char key, int x, int y) {
 			for (int i = 0; i < Lego.size() - 1; i++) { //모든 도형에 대해 체크
 				flag = check_collision(Lego[Lego.size() - 1], Lego[i]);
 				if (flag == false) {
-					if ((Lego[Lego.size() - 1].changeangle) == 0 || (Lego[Lego.size() - 1].changeangle == 180)) {
-						Lego[Lego.size() - 1].change_y = Lego[i].change_y - (box[Lego[Lego.size() - 1].lego].max_y + box[Lego[i].lego].max_y);
-					}
+					Lego[Lego.size() - 1].change_y = Lego[i].change_y - (box[Lego[Lego.size() - 1].lego].max_y + box[Lego[i].lego].max_y);
 					Lego[Lego.size() - 1].min_y = Lego[Lego.size() - 1].min_y - 0.1;
 					Lego[Lego.size() - 1].max_y = Lego[Lego.size() - 1].max_y - 0.1;
 				}
@@ -589,9 +654,7 @@ void keyboard(unsigned char key, int x, int y) {
 			for (int i = 0; i < Lego.size() - 1; i++) { //모든 도형에 대해 체크
 				flag = check_collision(Lego[Lego.size() - 1], Lego[i]);
 				if (flag == false) {
-					if ((Lego[Lego.size() - 1].changeangle) == 0 || (Lego[Lego.size() - 1].changeangle == 180)) {
-						Lego[Lego.size() - 1].change_y = Lego[i].change_y + (box[Lego[Lego.size() - 1].lego].min_y + box[Lego[i].lego].max_y);
-					}
+					Lego[Lego.size() - 1].change_y = Lego[i].change_y + (box[Lego[Lego.size() - 1].lego].max_y + box[Lego[i].lego].max_y);
 					Lego[Lego.size() - 1].min_y = Lego[Lego.size() - 1].min_y + 0.1;
 					Lego[Lego.size() - 1].max_y = Lego[Lego.size() - 1].max_y + 0.1;
 				}
@@ -703,31 +766,140 @@ void keyboard(unsigned char key, int x, int y) {
 			eyy1 = half1 * sin(the1)*sin(pi1);
 			eyz1 = half1 * cos(the1);
 		}
-		else if (key == 'w') {
-			situation = 1;
-			for (int i = 0; i < Game1.size(); i++) {
-				Game1[i].change_x = Game1[i].change_x - 1;
+		else if (key == 's') {
+			if (player_mode == 1) {
+				situation = 1;
+				for (int i = 0; i < Game1.size(); i++) {
+					Game1[i].change_x = Game1[i].change_x - 1;
+				}
 			}
 		}
-		else if (key == 's') {
-			situation = 2;
-			for (int i = 0; i < Game1.size(); i++) {
-				Game1[i].change_x = Game1[i].change_x + 1;
+		else if (key == 'w') {
+			if (player_mode == 1) {
+				situation = 2;
+				for (int i = 0; i < Game1.size(); i++) {
+					Game1[i].change_x = Game1[i].change_x + 1;
+				}
+			}
+		}
+		else if (key == 'd') {
+			if (player_mode == 1) {
+				move_theta = move_theta - 1;
+				if (move_theta < 0)
+					move_theta = move_theta + 360;
 			}
 		}
 		else if (key == 'a') {
-
-			move_theta = move_theta + 2;
-			if (move_theta >= 360)
-				move_theta = move_theta - 360;
+			if (player_mode == 1) {
+				move_theta = move_theta + 1;
+				if (move_theta >= 360)
+					move_theta = move_theta - 360;
+			}
 		}
-		else if (key == 'd') {
-			move_theta = move_theta - 2;
-			if (move_theta <= 0)
-				move_theta = move_theta + 360;
+		else if (key == 'k') {
+			if (player_mode == 2) {
+				situation = 1;
+				for (int i = 0; i < Game1.size(); i++) {
+					Game2[i].change_x = Game2[i].change_x - 1;
+				}
+			}
 		}
+		else if (key == 'i') {
+			if (player_mode == 2) {
+				situation = 2;
+				for (int i = 0; i < Game1.size(); i++) {
+					Game2[i].change_x = Game2[i].change_x + 1;
+				}
+			}
+		}
+		else if (key == 'j') {
+			if (player_mode == 2) {
+				move_theta2 = move_theta2 + 1;
+				if (move_theta2 >= 360)
+					move_theta2 = move_theta2 - 360;
+			}
+		}
+		else if (key == 'l') {
+			if (player_mode == 2) {
+				move_theta2 = move_theta2 - 1;
+				if (move_theta2 <= 0)
+					move_theta2 = move_theta2 + 360;
+			}
+		}
+		else if (key == 'm') {
+			if (map_toggle == 0)
+				map_toggle = 1;
+			else if (map_toggle == 1)
+				map_toggle = 0;
+		}
+		else if (key == 'f') {
+			if (player_mode == 1) {
+				canon_toggle = 1;
+				canon.change_x = Game1[2].change_x + Game1[2].max_x;
+				canon.change_y = Game1[2].change_y;
+				canon.change_z = Game1[2].change_z;
+			}
+			else if (player_mode == 2) {
+				canon_toggle = 1;
+				canon.change_x = Game2[2].change_x + Game1[2].max_x;
+				canon.change_y = Game2[2].change_y;
+				canon.change_z = Game2[2].change_z;
+			}
+		}
+		else if (key == 'b') {
+			if (player_mode == 1) {
+				for (int i = 0; i < Game1.size(); i++) {
+					if (Game1[i].lego == 9 || Game1[i].lego == 10 || Game1[i].lego == 11) {
+						if (canon_count1 < 5) {
+							canon.changeangle = canon.changeangle - 1;
+							canon_count1 = canon_count1 + 1;
+							Game1[i].changeangle = Game1[i].changeangle - 5;
+						}
+					}
+				}
+			}
+		}
+		else if (key == 'n') {
+			if (player_mode == 1) {
+				for (int i = 0; i < Game1.size(); i++) {
+					if (Game1[i].lego == 9 || Game1[i].lego == 10 || Game1[i].lego == 11) {
+						if (canon_count1 > -5) {
+							canon.changeangle = canon.changeangle + 1;
+							canon_count1 = canon_count1 - 1;
+							Game1[i].changeangle = Game1[i].changeangle + 5;
+						}
+					}
+				}
+			}
+		}
+		else if (key == 'c') {
+			if (player_mode == 2) {
+				for (int i = 0; i < Game2.size(); i++) {
+					if (Game2[i].lego == 9 || Game2[i].lego == 10 || Game2[i].lego == 11) {
+						if (canon_count2 < 5) {
+							canon.changeangle = canon.changeangle - 1;
+							canon_count2 = canon_count2 + 1;
+							Game2[i].changeangle = Game2[i].changeangle - 5;
+						}
+					}
+				}
+			}
+		}
+		else if (key == 'v') {
+			if (player_mode == 2) {
+				for (int i = 0; i < Game2.size(); i++) {
+					if (Game2[i].lego == 9 || Game2[i].lego == 10 || Game2[i].lego == 11) {
+						if (canon_count2 > -5) {
+							canon.changeangle = canon.changeangle + 1;
+							canon_count2 = canon_count2 - 1;
+							Game2[i].changeangle = Game2[i].changeangle + 5;
+						}
+					}
+				}
+			}
+		}
+		glutPostRedisplay();
 	}
-	glutPostRedisplay();
 }
 void sub_menu_savetank(int option) {
 	if (option == 1) {
@@ -891,14 +1063,35 @@ void main_menu_function(int option) {
 	printf("Main menu %d \n", option);
 	if (option == 999) {
 		Gamemode = 1;
+		player_mode = 1;
 		sub_Game_Loadtank1();
 		sub_Game_Loadtank2();
+		canon.lego = 12;
+		canon.change_x = Game1[2].change_x + Game1[2].max_x;
+		canon.change_y = Game1[2].change_y;
+		canon.change_z = Game1[21].change_z;
+		canon_angle = 0;
+
+		can = (picture[canon.lego]);
+		canon.changeangle = 5;
+		for (int i = 0; i < Game2.size(); i++) {
+			Game2[i].change_x = Game2[i].change_x - 50;
+			Game2[i].change_y = Game2[i].change_y - 9;
+		}
+		for (int i = 0; i<Game1.size(); i++)
+			Game1[i].change_y = Game1[i].change_y - 9;
+		move_theta2 = 180;
+		vs = 0;
 	}
 	else if (option == 888)
 	{
+		Lego.clear();
+		for (int i = 0; i < Game1.size(); i++) {
+			Game1[i].change_x = Game1[i].change_x - 3;
+		}
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 		Gamemode = 0;
 	}
 }
-
 #endif // ! MAKE_LEGO_H
 
