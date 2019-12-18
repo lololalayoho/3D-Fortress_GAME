@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <GL/freeglut.h>
-#include <stdlib.h>
+#include <stdlib.h>Fc
 #include <fstream>
 #include "make_Lego.h"
 #include "ObjParser.h"
@@ -10,7 +10,7 @@ using namespace std;
 
 GLfloat light_position1[] = { eyx1,eyy1,eyz1,1.0 };
 GLfloat light_position2[] = { eyx2,eyy2,eyz1,1.0 };
-
+void canon_check();
 void Game1_draw_block() {
 	glDisable(GL_TEXTURE_2D);
 	glViewport(0, 0, 1200, 700);
@@ -108,64 +108,135 @@ void Game2_draw_block(){
 	glFlush();
 	glutPostRedisplay();
 }
-void draw_canon() {
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+void draw_canon1() {
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_R);
+	glDisable(GL_TEXTURE_CUBE_MAP);
 	if (canon_toggle == 1) {
-		printf("canon's x : %fl\n", canon.change_x);
 		glColor3f(0.5f, 0.5f, 0.5f);
 		if (canon_angle >= 0 && canon_angle < 45) {
-			canon.change_x = canon.change_x + canon.changeangle*0.08 + 0.15;
-			canon.change_y = canon.change_y + canon.changeangle * 0.1;
-			if(player_mode == 1)
+			canon1.change_x = canon1.change_x + canon1.changeangle*0.08 + 0.15;
+			canon1.change_y = canon1.change_y + canon1.changeangle * 0.1;
 				glRotatef(move_theta, 0, 1, 0);
-			else if(player_mode == 2)
-				glRotatef(move_theta2, 0, 1, 0);
-			glTranslatef(canon.change_x, canon.change_y, canon.change_z);
-			draw_obj(&can);
+			glTranslatef(canon1.change_x, canon1.change_y, canon1.change_z);
+			draw_obj(&can1);
+			canon_check();
 		}
 		else if (canon_angle >= 45 && canon_angle < 60) {
-			canon.change_x = canon.change_x + canon.changeangle*0.08 + 0.15;
-			canon.change_y = canon.change_y + canon.changeangle * 0.05;
-			if (player_mode == 1)
+			canon1.change_x = canon1.change_x + canon1.changeangle*0.08 + 0.15;
+			canon1.change_y = canon1.change_y + canon1.changeangle * 0.05;
 				glRotatef(move_theta, 0, 1, 0);
-			else if (player_mode == 2)
-				glRotatef(move_theta2, 0, 1, 0);
-			glTranslatef(canon.change_x, canon.change_y, canon.change_z);
-			draw_obj(&can);
+			glTranslatef(canon1.change_x, canon1.change_y, canon1.change_z);
+			draw_obj(&can1);
+			canon_check();
 		}
 		else if (canon_angle >= 60 && canon_angle < 90) {
-			canon.change_x = canon.change_x + canon.changeangle*0.08 + 0.15;
-			canon.change_y = canon.change_y + canon.change_y*0.0025;
-			if (canon.change_y < -9)canon.change_y = -9;
-			if (player_mode == 1)
+			canon1.change_x = canon1.change_x + canon1.changeangle*0.08 + 0.15;
+			canon1.change_y = canon1.change_y + canon1.change_y*0.0025;
+			if (canon1.change_y < -9)canon1.change_y = -9;
 				glRotatef(move_theta, 0, 1, 0);
-			else if (player_mode == 2)
-				glRotatef(move_theta2, 0, 1, 0);
-			glTranslatef(canon.change_x, canon.change_y, canon.change_z);
-			draw_obj(&can);
+			glTranslatef(canon1.change_x, canon1.change_y, canon1.change_z);
+			draw_obj(&can1);
+			canon_check();
 		}
 		else if (canon_angle >= 90 && canon_angle < 135) {
-			canon.change_x = canon.change_x + canon.changeangle*0.08 + 0.15;
-			canon.change_y = canon.change_y - canon.changeangle*0.05;
-			if (canon.change_y < -9)canon.change_y = -9;
-			if(player_mode == 1)
+			canon1.change_x = canon1.change_x + canon1.changeangle*0.08 + 0.15;
+			canon1.change_y = canon1.change_y - canon1.changeangle*0.05;
+			if (canon1.change_y < -9)canon1.change_y = -9;
 				glRotatef(move_theta, 0, 1, 0);
-			else if(player_mode == 2)
-				glRotatef(move_theta2, 0, 1, 0);
-			glTranslatef(canon.change_x, canon.change_y, canon.change_z);
-			draw_obj(&can);
+			glTranslatef(canon1.change_x, canon1.change_y, canon1.change_z);
+			draw_obj(&can1);
+			canon_check();
 		}
 		else if (canon_angle >= 135 && canon_angle < 180) {
-			canon.change_x = canon.change_x + canon.changeangle*0.08 + 0.15;
-			canon.change_y = canon.change_y - canon.changeangle * 0.1;
-			if (canon.change_y < -9)canon.change_y = -9;
-			if (player_mode == 1)
+			canon1.change_x = canon1.change_x + canon1.changeangle*0.08 + 0.15;
+			canon1.change_y = canon1.change_y - canon1.changeangle * 0.1;
+			if (canon1.change_y < -9)canon1.change_y = -9;
 				glRotatef(move_theta, 0, 1, 0);
+			glTranslatef(canon1.change_x, canon1.change_y, canon1.change_z);
+			draw_obj(&can1);
+			canon_check();
+		}
+	}
+}
+void draw_canon2() {
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_R);
+	glDisable(GL_TEXTURE_CUBE_MAP);
+	//PlaySound(TEXT("sound/Fire1-1.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
+	if (canon_toggle == 1) {
+		glColor3f(0.5f, 0.5f, 0.5f);
+		if (canon_angle >= 0 && canon_angle < 45) {
+			canon2.change_x = canon2.change_x + canon2.changeangle*0.08 + 0.15;
+			canon2.change_y = canon2.change_y + canon2.changeangle * 0.1;
+			if (player_mode == 2)
+				glRotatef(move_theta2, 0, 1, 0);
+			glTranslatef(canon2.change_x, canon2.change_y, canon2.change_z);
+			draw_obj(&can1);
+			canon_check();
+		}
+		else if (canon_angle >= 45 && canon_angle < 60) {
+			canon2.change_x = canon2.change_x + canon2.changeangle*0.08 + 0.15;
+			canon2.change_y = canon2.change_y + canon2.changeangle * 0.05;
+			if (player_mode == 2)
+				glRotatef(move_theta2, 0, 1, 0);
+			glTranslatef(canon2.change_x, canon2.change_y, canon2.change_z);
+			draw_obj(&can1);
+			canon_check();
+		}
+		else if (canon_angle >= 60 && canon_angle < 90) {
+			canon2.change_x = canon2.change_x + canon2.changeangle*0.08 + 0.15;
+			canon2.change_y = canon2.change_y + canon2.change_y*0.0025;
+			if (canon2.change_y < -9)canon2.change_y = -9;
 			else if (player_mode == 2)
 				glRotatef(move_theta2, 0, 1, 0);
-			glTranslatef(canon.change_x, canon.change_y, canon.change_z);
-			draw_obj(&can);
+			glTranslatef(canon2.change_x, canon2.change_y, canon2.change_z);
+			draw_obj(&can1);
+			canon_check();
+		}
+		else if (canon_angle >= 90 && canon_angle < 135) {
+			canon2.change_x = canon2.change_x + canon2.changeangle*0.08 + 0.15;
+			canon2.change_y = canon2.change_y - canon2.changeangle*0.05;
+			if (canon2.change_y < -9)canon2.change_y = -9;
+			if (player_mode == 2)
+				glRotatef(move_theta2, 0, 1, 0);
+			glTranslatef(canon2.change_x, canon2.change_y, canon2.change_z);
+			draw_obj(&can1);
+			canon_check();
+		}
+		else if (canon_angle >= 135 && canon_angle < 180) {
+			canon2.change_x = canon2.change_x + canon2.changeangle*0.08 + 0.15;
+			canon2.change_y = canon2.change_y - canon2.changeangle * 0.1;
+			if (canon2.change_y < -9)canon2.change_y = -9;
+			if (player_mode == 2)
+				glRotatef(move_theta2, 0, 1, 0);
+			glTranslatef(canon2.change_x, canon2.change_y, canon2.change_z);
+			draw_obj(&can1);
+			canon_check();
+		}
+	}
+}
+void canon_check() {
+	if (player_mode == 2) {
+		for (int i = 0; i < Game1.size(); i++) {
+			if ((int)Game1[i].change_x + 1 >= (int)canon2.change_x && (int)Game1[i].change_x - 1 <= (int)canon2.change_x) {
+				if ((int)Game1[i].change_y + 2 >= (int)canon2.change_y && (int)Game1[i].change_y - 2 <= (int)canon2.change_y)
+					vs = 1;
+			}
+		}
+	}
+	else if (player_mode == 1) {
+		for (int i = 0; i < Game2.size(); i++) {
+			if ((int)Game2[i].change_x*(-1) + 1 >= (int)canon1.change_x && (int)Game2[i].change_x*(-1) - 1 <= (int)canon1.change_x) {
+				if ((int)Game2[i].change_y + 2 >= (int)canon1.change_y && (int)Game2[i].change_y - 2 <= (int)canon1.change_y)
+					vs = 2;
+			}
 		}
 	}
 }

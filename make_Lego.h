@@ -39,7 +39,8 @@ extern void cubeTextureMapping();
 extern void sub_Game_Loadtank1();
 extern void sub_Game_Loadtank2();
 extern void skyboxMapping();
-extern void draw_canon();
+extern void draw_canon1();
+extern void draw_canon2();
 //--------------Player1회전 위치-----------//
 int x_up1 = 0;
 int y_up1 = 1;
@@ -119,7 +120,7 @@ struct collision {
 	double max_z;
 };
 vector<condition> Lego; condition cond; float angel1 = 0; float angel2; float angel3; ObjParser object; int text_index; int Gamemode; int situation; double move_theta; double move_theta2;
-void setTextureMapping(); double value1; double value2; int canon_toggle; ObjParser can; int player_mode;
+void setTextureMapping(); double value1; double value2; int canon_toggle; ObjParser can1; ObjParser can2; int player_mode;
 condition canon1; condition canon2; double canon_angle; int canon_count1; int canon_count2; int vs;
 GLuint texture[6]; GLfloat light_position[] = { eyex,eyey,eyez,1.0 };
 collision box[50] = { {1.4,2.5,0.5,0.5,1.5,1.5}, {1.4,2.5,0.5,0.5,1.5,1.5}, {0.35,0.35,0.5,0.5,1,1},{0.6,0.6,0.6,0.6,0.25,0.25}, {2.5,2.5,0.75,0.75,0.75,0.75}, {0.12,0.12,1.2,1.2,1.2,1.2},{0.9,1,0.1,0.1,1,1},{0.9,1,0.1,0.1,1,1},{1,1,0,0.05,1,1},{1.5,1.5,0,1,0.3,0.3},{0,2.6,0,1,0.5,0.5},{0.5,0.5,0.75,0.75,0.75,0.75} };
@@ -185,21 +186,9 @@ void idle(void) {
 	if (canon_toggle == 1) {
 		canon_angle = canon_angle + 1;
 		if (canon_angle > 180) {
+			PlaySound(TEXT("sound/bomb3-1.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
 			canon_angle -= 180;
-			if (player_mode == 2) {
-				for (int i = 0; i < Game1.size(); i++) {
-					if ((int)Game1[i].change_x*(-1) -1 >= canon.change_x && (int)Game1[i].change_x*(-1) + 1 <= canon.change_x)
-						vs = 2;
-				}
-			}
-			else if (player_mode == 1) {
-				for (int i = 0; i < Game2.size(); i++) {
-					if ((int)Game2[i].change_x*(-1) - 2 <= canon.change_x && (int)Game2[i].change_x*(-1) + 2 >= canon.change_x)
-						vs = 1;
-				}
-			}
-			canon_toggle = 0;
-
+			canon_toggle = 0;			
 			if (player_mode == 1)
 				player_mode = 2;
 			else if (player_mode == 2)
@@ -456,18 +445,22 @@ void draw(void) {
 		glDisable(GL_TEXTURE_GEN_R);
 		glDisable(GL_TEXTURE_CUBE_MAP);
 		if (player_mode == 1) {
-			glPushMatrix();			
+			glPushMatrix();		
 			Game_draw();
-			draw_canon();
+			draw_canon1();
 			if (vs == 1)
+				draw_vs();
+			else if (vs == 2)
 				draw_vs();
 			glPopMatrix();
 		}
 		else if (player_mode == 2){
 			glPushMatrix();	
 			Game_draw();
-			draw_canon();
-			if (vs == 2)
+			draw_canon2();
+			if (vs == 1)
+				draw_vs();
+			else if (vs == 2)
 				draw_vs();
 			glPopMatrix();
 		}
@@ -713,60 +706,7 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 	}
 	else if (Gamemode == 1) {
-		if (key == '1') {
-			pi1 = pi1 - cha1;
-			eyx1 = half1 * sin(the1)*cos(pi1);
-			eyy1 = half1 * sin(the1)*sin(pi1);
-			eyz1 = half1 * cos(the1);
-		}
-		else if (key == '2') {
-			pi1 = pi1 + cha1;
-			eyx1 = half1 * sin(the1)*cos(pi1);
-			eyy1 = half1 * sin(the1)*sin(pi1);
-			eyz1 = half1 * cos(the1);
-		}
-		else if (key == '3') {
-			the1 = the1 + cha1;
-			if (the1 > 2 * M_PI)
-				the1 -= 2 * M_PI;
-
-			if (the1 > M_PI)
-			{
-				x_up1 = 0;
-				y_up1 = -1;
-				z_up1 = 0;
-			}
-			else if (the1 <= M_PI) {
-				x_up1 = 0;
-				y_up1 = 1;
-				z_up1 = 0;
-			}
-			eyx1 = half1 * sin(the1)*cos(pi1);
-			eyy1 = half1 * sin(the1)*sin(pi1);
-			eyz1 = half1 * cos(the1);
-
-		}
-		else if (key == '4') {
-			the1 = the1 - cha1;
-			if (the1 < 0)
-				the1 += 2 * M_PI;
-
-			if (the1 > M_PI)
-			{
-				x_up1 = 0;
-				y_up1 = -1;
-				z_up1 = 0;
-			}
-			else if (the1 <= M_PI) {
-				x_up1 = 0;
-				y_up1 = 1;
-				z_up1 = 0;
-			}
-			eyx1 = half1 * sin(the1)*cos(pi1);
-			eyy1 = half1 * sin(the1)*sin(pi1);
-			eyz1 = half1 * cos(the1);
-		}
-		else if (key == 's') {
+		if (key == 's') {
 			if (player_mode == 1) {
 				situation = 1;
 				for (int i = 0; i < Game1.size(); i++) {
@@ -833,17 +773,18 @@ void keyboard(unsigned char key, int x, int y) {
 				map_toggle = 0;
 		}
 		else if (key == 'f') {
+			PlaySound(TEXT("sound/Fire1-1.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
 			if (player_mode == 1) {
 				canon_toggle = 1;
-				canon.change_x = Game1[2].change_x + Game1[2].max_x;
-				canon.change_y = Game1[2].change_y;
-				canon.change_z = Game1[2].change_z;
+				canon1.change_x = Game1[2].change_x + Game1[2].max_x;
+				canon1.change_y = Game1[2].change_y;
+				canon1.change_z = Game1[2].change_z;
 			}
 			else if (player_mode == 2) {
 				canon_toggle = 1;
-				canon.change_x = Game2[2].change_x + Game1[2].max_x;
-				canon.change_y = Game2[2].change_y;
-				canon.change_z = Game2[2].change_z;
+				canon2.change_x = Game2[2].change_x + Game1[2].max_x;
+				canon2.change_y = Game2[2].change_y;
+				canon2.change_z = Game2[2].change_z;
 			}
 		}
 		else if (key == 'b') {
@@ -851,7 +792,7 @@ void keyboard(unsigned char key, int x, int y) {
 				for (int i = 0; i < Game1.size(); i++) {
 					if (Game1[i].lego == 9 || Game1[i].lego == 10 || Game1[i].lego == 11) {
 						if (canon_count1 < 5) {
-							canon.changeangle = canon.changeangle - 1;
+							canon1.changeangle = canon1.changeangle - 1;
 							canon_count1 = canon_count1 + 1;
 							Game1[i].changeangle = Game1[i].changeangle - 5;
 						}
@@ -864,7 +805,7 @@ void keyboard(unsigned char key, int x, int y) {
 				for (int i = 0; i < Game1.size(); i++) {
 					if (Game1[i].lego == 9 || Game1[i].lego == 10 || Game1[i].lego == 11) {
 						if (canon_count1 > -5) {
-							canon.changeangle = canon.changeangle + 1;
+							canon1.changeangle = canon1.changeangle + 1;
 							canon_count1 = canon_count1 - 1;
 							Game1[i].changeangle = Game1[i].changeangle + 5;
 						}
@@ -877,7 +818,7 @@ void keyboard(unsigned char key, int x, int y) {
 				for (int i = 0; i < Game2.size(); i++) {
 					if (Game2[i].lego == 9 || Game2[i].lego == 10 || Game2[i].lego == 11) {
 						if (canon_count2 < 5) {
-							canon.changeangle = canon.changeangle - 1;
+							canon2.changeangle = canon2.changeangle - 1;
 							canon_count2 = canon_count2 + 1;
 							Game2[i].changeangle = Game2[i].changeangle - 5;
 						}
@@ -890,7 +831,7 @@ void keyboard(unsigned char key, int x, int y) {
 				for (int i = 0; i < Game2.size(); i++) {
 					if (Game2[i].lego == 9 || Game2[i].lego == 10 || Game2[i].lego == 11) {
 						if (canon_count2 > -5) {
-							canon.changeangle = canon.changeangle + 1;
+							canon2.changeangle = canon2.changeangle + 1;
 							canon_count2 = canon_count2 - 1;
 							Game2[i].changeangle = Game2[i].changeangle + 5;
 						}
@@ -1066,14 +1007,14 @@ void main_menu_function(int option) {
 		player_mode = 1;
 		sub_Game_Loadtank1();
 		sub_Game_Loadtank2();
-		canon.lego = 12;
-		canon.change_x = Game1[2].change_x + Game1[2].max_x;
-		canon.change_y = Game1[2].change_y;
-		canon.change_z = Game1[21].change_z;
+		canon1.lego = 12;
+		canon2.lego = 12;
 		canon_angle = 0;
 
-		can = (picture[canon.lego]);
-		canon.changeangle = 5;
+		can1 = (picture[canon1.lego]);
+		can2 = (picture[canon2.lego]);
+		canon1.changeangle = 5;
+		canon2.changeangle = 5;
 		for (int i = 0; i < Game2.size(); i++) {
 			Game2[i].change_x = Game2[i].change_x - 50;
 			Game2[i].change_y = Game2[i].change_y - 9;
