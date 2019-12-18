@@ -2,11 +2,11 @@
 #include <iostream>
 #include <vector>
 #include <GL/freeglut.h>
-#include <stdlib.h>Fc
+#include <stdlib.h>
 #include <fstream>
+#include <Windows.h>
 #include "make_Lego.h"
 #include "ObjParser.h"
-using namespace std;
 
 GLfloat light_position1[] = { eyx1,eyy1,eyz1,1.0 };
 GLfloat light_position2[] = { eyx2,eyy2,eyz1,1.0 };
@@ -225,16 +225,16 @@ void draw_canon2() {
 void canon_check() {
 	if (player_mode == 2) {
 		for (int i = 0; i < Game1.size(); i++) {
-			if ((int)Game1[i].change_x + 1 >= (int)canon2.change_x && (int)Game1[i].change_x - 1 <= (int)canon2.change_x) {
-				if ((int)Game1[i].change_y + 2 >= (int)canon2.change_y && (int)Game1[i].change_y - 2 <= (int)canon2.change_y)
+			if ((int)Game1[i].change_x + 0.5 >= (int)canon2.change_x && (int)Game1[i].change_x - 0.5 <= (int)canon2.change_x) {
+				if ((int)Game1[i].change_y + 1 >= (int)canon2.change_y && (int)Game1[i].change_y - 1 <= (int)canon2.change_y)
 					vs = 1;
 			}
 		}
 	}
 	else if (player_mode == 1) {
 		for (int i = 0; i < Game2.size(); i++) {
-			if ((int)Game2[i].change_x*(-1) + 1 >= (int)canon1.change_x && (int)Game2[i].change_x*(-1) - 1 <= (int)canon1.change_x) {
-				if ((int)Game2[i].change_y + 2 >= (int)canon1.change_y && (int)Game2[i].change_y - 2 <= (int)canon1.change_y)
+			if ((int)Game2[i].change_x*(-1) + 0.5 >= (int)canon1.change_x && (int)Game2[i].change_x*(-1) - 0.5 <= (int)canon1.change_x) {
+				if ((int)Game2[i].change_y + 1 >= (int)canon1.change_y && (int)Game2[i].change_y - 1 <= (int)canon1.change_y)
 					vs = 2;
 			}
 		}

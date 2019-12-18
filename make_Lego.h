@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <Windows.h>
-#include <Mmsystem.h>
+#include <mmsystem.h>
 #include "mapping.h"
 #include "ObjParser.h"
 #include "GL/glext.h"
@@ -438,6 +438,7 @@ void draw(void) {
 	}
 	else if (Gamemode == 1) {
 		glPushMatrix();
+		//sound();
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 		glDisable(GL_TEXTURE_GEN_S);
@@ -445,7 +446,7 @@ void draw(void) {
 		glDisable(GL_TEXTURE_GEN_R);
 		glDisable(GL_TEXTURE_CUBE_MAP);
 		if (player_mode == 1) {
-			glPushMatrix();		
+			glPushMatrix();
 			Game_draw();
 			draw_canon1();
 			if (vs == 1)
@@ -474,6 +475,7 @@ bool check_collision(condition a, condition b) {
 	if (((a.max_y <= b.max_y) && (a.max_y >= b.min_y)) || ((a.max_y >= b.max_y) && (a.min_y <= b.max_y))) {
 		if (((a.max_z <= b.max_z) && (a.max_z >= b.min_z)) || ((a.max_z >= b.max_z) && (a.min_z <= b.max_z))) {
 			if (((a.max_x <= b.max_x) && (a.max_x >= b.min_x)) || ((a.max_x >= b.max_x) && (a.min_x <= b.max_x))) {
+				PlaySound(TEXT("sound/fire9-2.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
 				return false;
 			}
 		}
@@ -706,7 +708,10 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 	}
 	else if (Gamemode == 1) {
-		if (key == 's') {
+		if (key == '1') {
+			player_mode = 3;
+		}
+		else if (key == 's') {
 			if (player_mode == 1) {
 				situation = 1;
 				for (int i = 0; i < Game1.size(); i++) {
@@ -752,14 +757,14 @@ void keyboard(unsigned char key, int x, int y) {
 				}
 			}
 		}
-		else if (key == 'j') {
+		else if (key == 'l') {
 			if (player_mode == 2) {
 				move_theta2 = move_theta2 + 1;
 				if (move_theta2 >= 360)
 					move_theta2 = move_theta2 - 360;
 			}
 		}
-		else if (key == 'l') {
+		else if (key == 'j') {
 			if (player_mode == 2) {
 				move_theta2 = move_theta2 - 1;
 				if (move_theta2 <= 0)
@@ -776,15 +781,23 @@ void keyboard(unsigned char key, int x, int y) {
 			PlaySound(TEXT("sound/Fire1-1.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
 			if (player_mode == 1) {
 				canon_toggle = 1;
-				canon1.change_x = Game1[2].change_x + Game1[2].max_x;
-				canon1.change_y = Game1[2].change_y;
-				canon1.change_z = Game1[2].change_z;
+				for (int i = 0; i < Game1.size(); i++) {
+					if (Game1[i].lego == 9 || Game1[i].lego == 10 || Game1[i].lego == 11) {
+						canon1.change_x = Game1[i].change_x ;
+						canon1.change_y = Game1[i].change_y;
+						canon1.change_z = Game1[i].change_z;
+					}
+				}
 			}
 			else if (player_mode == 2) {
 				canon_toggle = 1;
-				canon2.change_x = Game2[2].change_x + Game1[2].max_x;
-				canon2.change_y = Game2[2].change_y;
-				canon2.change_z = Game2[2].change_z;
+				for (int i = 0; i < Game2.size(); i++) {
+					if (Game2[i].lego == 9 || Game2[i].lego == 10 || Game2[i].lego == 11) {
+						canon2.change_x = Game2[i].change_x;
+						canon2.change_y = Game2[i].change_y;
+						canon2.change_z = Game2[i].change_z;
+					}
+				}
 			}
 		}
 		else if (key == 'b') {
@@ -1010,7 +1023,6 @@ void main_menu_function(int option) {
 		canon1.lego = 12;
 		canon2.lego = 12;
 		canon_angle = 0;
-
 		can1 = (picture[canon1.lego]);
 		can2 = (picture[canon2.lego]);
 		canon1.changeangle = 5;

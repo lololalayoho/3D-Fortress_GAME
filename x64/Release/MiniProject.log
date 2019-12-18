@@ -1,5 +1,4 @@
 ﻿  main.cpp
-e:\computer_grapic\miniproject\miniproject\main.cpp(5): warning C4067: 전처리기 지시문 다음에 예기치 않은 토큰이 있습니다. 줄 바꿈 문자가 필요합니다.
 e:\computer_grapic\miniproject\miniproject\objparser.h(180): warning C4477: 'fprintf' : 서식 문자열 '%s'에 'char *' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'입니다.
 e:\computer_grapic\miniproject\miniproject\objparser.h(218): warning C4267: 'return': 'size_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 e:\computer_grapic\miniproject\miniproject\make_lego.h(125): warning C4838: 'double'에서 'GLfloat'(으)로의 변환에는 축소 변환이 필요합니다.
@@ -39,8 +38,8 @@ e:\computer_grapic\miniproject\miniproject\main.cpp(256): warning C4244: '인수
 e:\computer_grapic\miniproject\miniproject\main.cpp(284): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 e:\computer_grapic\miniproject\miniproject\main.cpp(296): warning C4244: '인수': 'double'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   코드를 생성하고 있습니다.
-  4 of 584 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
+  1 of 584 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    1 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   MiniProject.vcxproj -> E:\computer_grapic\MiniProject\x64\Release\MiniProject.exe
