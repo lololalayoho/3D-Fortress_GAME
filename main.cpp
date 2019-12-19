@@ -98,7 +98,6 @@ void Game2_draw_block(){
 		else if (Game2[i].text_button == 1) { //object ±×¸®±â
 			draw_obj_with_texture(&object, Game2[i].text_index);
 		}
-		draw_axies();
 		glPopMatrix();
 	}
 	glPopMatrix();
@@ -169,7 +168,6 @@ void draw_canon2() {
 	glDisable(GL_TEXTURE_GEN_T);
 	glDisable(GL_TEXTURE_GEN_R);
 	glDisable(GL_TEXTURE_CUBE_MAP);
-	//PlaySound(TEXT("sound/Fire1-1.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
 	if (canon_toggle == 1) {
 		glColor3f(0.5f, 0.5f, 0.5f);
 		if (canon_angle >= 0 && canon_angle < 45) {

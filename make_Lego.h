@@ -339,34 +339,117 @@ void draw_obj_with_texture(ObjParser *objParser, int text_index)
 
 void draw_text() {
 	glDisable(GL_TEXTURE_2D);
-	glViewport(0, 30, 200, 700);
+	glViewport(0, -50, 100, 700);
 	glLoadIdentity();
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "l : GO Forward", 0, 0);
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "j : GO backward", 0, 1);
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "k : GO to Left", 0, 2);
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "L : Go to Right", 0, 3);
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, ", : Go to Top", 0, 4);
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, ". : Go to Down", 0, 5);
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "u : Remove Lego", 0, 6);
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "c : Change color", 0, 7);
-	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "t : Change Texture", 0, 8);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "k : GO Forward", 0, -1);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "i : GO backward", 0,0);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "l : GO to Left", 0, 1);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "j : Go to Right", 0,2);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, ", : Go to Top", 0, 3);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, ". : Go to Down", 0,4);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "u : Remove Lego", 0, 5);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "c : Change color", 0, 6);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "t : Change Texture", 0, 7);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "f : preview change Lego", 0, 8);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "space bar : Choose Lego ", 0, 9);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "- : Spin to Top", 0, 10);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "= : Spin to Down", 0, 11);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "9 : Spin 90 angle for Left ", 0, 12);
 	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "0 : Spin 90 angle for Right ", 0, 13);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "Mouse left clicking : Spin", 0, 14);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "Mouse right click have functions", 0, 15);
 	glEnable(GL_TEXTURE_2D);
 	glFlush();
 }
 void draw_vs() {
 	glDisable(GL_TEXTURE_2D);
-	glViewport(0, 300, 600, 300);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_R);
+	glDisable(GL_TEXTURE_CUBE_MAP);
+	glViewport(350, 100, 600, 300);
 	glLoadIdentity();
 	if(vs == 2)
 		draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "PLAYER 1 WIN ", 0, 1);
 	else if(vs ==1)
 		draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "PLAYER 2 WIN ", 0, 1);
 	glEnable(GL_TEXTURE_2D);
+	glFlush();
+}
+void draw_mapchange() {
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_R);
+	glDisable(GL_TEXTURE_CUBE_MAP);
+	glViewport(480, 50, 200, 100);
+	glLoadIdentity();
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "m : change map", 0, 0);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+	glEnable(GL_TEXTURE_GEN_R);
+	glEnable(GL_TEXTURE_CUBE_MAP);
+	glFlush();
+}
+void draw_Game1_text() {
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_R);
+	glDisable(GL_TEXTURE_CUBE_MAP);
+	glViewport(-100, 350, 600, 300);
+	glLoadIdentity();
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "----PLAYER 1----", 0, 14);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "w : GO Forward", 0, 12);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "s : GO backward", 0, 10);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "d : GO to Left", 0, 8);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "a : Go to Right", 0, 6);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "n : canon Go to Top", 0, 4);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "b : canon Go to Down", 0, 2);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "f : shoot!!", 0, 0);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+	glEnable(GL_TEXTURE_GEN_R);
+	glEnable(GL_TEXTURE_CUBE_MAP);
+	glFlush();
+}
+void draw_Game2_text(){
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_R);
+	glDisable(GL_TEXTURE_CUBE_MAP);
+	glViewport(800, 350, 600, 300);
+	glLoadIdentity();
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "----PLAYER 2----", 0, 14);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "i : GO Forward", 0, 12);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "k : GO backward", 0, 10);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "l : GO to Left", 0, 8);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "j : Go to Right", 0, 6);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "v : canon Go to Top", 0, 4);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "c : canon Go to Down", 0, 2);
+	draw_string(GLUT_BITMAP_TIMES_ROMAN_24, "f : shoot!!", 0, 0);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+	glEnable(GL_TEXTURE_GEN_R);
+	glEnable(GL_TEXTURE_CUBE_MAP);
 	glFlush();
 }
 
@@ -449,6 +532,9 @@ void draw(void) {
 			glPushMatrix();
 			Game_draw();
 			draw_canon1();
+			draw_Game1_text();
+			draw_Game2_text();
+			draw_mapchange();
 			if (vs == 1)
 				draw_vs();
 			else if (vs == 2)
@@ -459,6 +545,9 @@ void draw(void) {
 			glPushMatrix();	
 			Game_draw();
 			draw_canon2();
+			draw_Game1_text();
+			draw_Game2_text();
+			draw_mapchange();
 			if (vs == 1)
 				draw_vs();
 			else if (vs == 2)
@@ -1020,6 +1109,8 @@ void main_menu_function(int option) {
 		player_mode = 1;
 		sub_Game_Loadtank1();
 		sub_Game_Loadtank2();
+		move_theta = 0;
+		move_theta2 = 0;
 		canon1.lego = 12;
 		canon2.lego = 12;
 		canon_angle = 0;
@@ -1027,6 +1118,8 @@ void main_menu_function(int option) {
 		can2 = (picture[canon2.lego]);
 		canon1.changeangle = 5;
 		canon2.changeangle = 5;
+		canon_count1 = 0;
+		canon_count2 = 0;
 		for (int i = 0; i < Game2.size(); i++) {
 			Game2[i].change_x = Game2[i].change_x - 50;
 			Game2[i].change_y = Game2[i].change_y - 9;
