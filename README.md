@@ -1,7 +1,12 @@
 # 3D 포트리스 게임
 
 ## 실행방법
-_main.cpp파일 실행_
+<pre>
+<code>
+git clone https://github.com/lololalayoho/3D-Fortress_GAME.git
+main.cpp파일 실행
+</code>
+</pre>
 
 ### 1. 나만의 포트리스 만들기
 
